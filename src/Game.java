@@ -15,7 +15,6 @@ public class Game extends JPanel implements MouseListener, MouseMotionListener {
 
     public Game() {
         setBackground(Color.black);
-        faces.initializePolygons();
         faces.define('X','Y','Z','W');
         board.randomizer(3);
         state.randomizer(3);
@@ -48,6 +47,7 @@ public class Game extends JPanel implements MouseListener, MouseMotionListener {
         addMouseMotionListener(new MouseMotionListener() {
             @Override
             public void mouseMoved(MouseEvent e) {
+                faces.mouseMoved(e);
             }
 
             @Override
