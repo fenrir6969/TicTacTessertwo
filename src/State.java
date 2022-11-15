@@ -7,6 +7,7 @@ public class State {
     protected char[][][][] board;
     protected char[][] cubes;
     protected char hyper;
+    Faces curr;
 
     int mosX;
     int mosY;
@@ -14,8 +15,8 @@ public class State {
     int cubeDepth;
     char[] cubeNet = new char[6];
     int load;
-    Polygon polygons[];
-    String[] cubeNames = new String[6];
+    int flash;
+    Polygon[] polygons;
     int[][] cubeAddresses = new int[6][2];
 
     public State(){
@@ -88,33 +89,6 @@ public class State {
         }
         System.out.println();
         return net;
-    }
-    public void randomizer(int randomness){
-        board = new char[3][3][3][3];
-        cubes = new char[2][4];
-        Random ran = new Random();
-        for(int w = 0; w < 3; w++) {
-            for(int y = 0; y < 3; y++) {
-                for(int x = 0; x < 3; x++) {
-                    for(int z = 0; z < 3; z++) {
-                        int r = ran.nextInt(randomness);
-                        if (r == 0) {
-                            board[x][y][z][w] = 'x';
-                            System.out.print('x');
-                        } else if (r == 1) {
-                            board[x][y][z][w] = 'o';
-                            System.out.print('o');
-                        } else {
-                            board[x][y][z][w] = '-';
-                            System.out.print('-');
-                        }
-                    }
-                }
-            }
-        }
-        checkGame();
-        cubeNet=getNet(cubeDepth,cubeAxis);
-        load=20;
     }
 
     public char get( Faces face) {
@@ -349,15 +323,79 @@ public class State {
 
         cubeNet=getNet(0,0);
         cubeAddresses = getDisplayNet(0,0);
-        for(int i=0;i<6;i++){
-            cubeNames[i] = cubeName(cubeAddresses[i][0],cubeAddresses[i][1]);
+    }
+    public void endGamePolygons() {
+        int offsetX=410;
+        int offsetY=250;
+        int[] px;
+        int[] py;
+        for(int i=0;i<8;i++){
+            px=polygons[i].xpoints;
+            py=polygons[i].ypoints;
+            for(int j=0;j<6;j++){
+                px[j]=px[j]+offsetX;
+                py[j]=py[j]+offsetY;
+            }
+            polygons[i]= new Polygon(px,py,6);
         }
+    }
+    public void paintEnd(Graphics2D g){
+        int offsetX=410;
+        int offsetY=250;
+
+        g.drawRect(460, 300, 240, 240);
+        g.setColor(Color.black);
+        g.fillPolygon(polygons[3]);
+        g.setColor(getColor(3,0,false));
+        g.drawPolygon(polygons[3]);
+        g.drawString("w0",70+offsetX,80+offsetY);
+        //x0
+        g.setColor(Color.black);
+        g.fillPolygon(polygons[0]);
+        g.setColor(getColor(0,0,false));
+        g.drawPolygon(polygons[0]);
+        g.drawString("x0",110+offsetX,146+offsetY);
+        //z2  250 - 190 , 170 - 110
+        g.setColor(Color.black);
+        g.fillPolygon(polygons[6]);
+        g.setColor(getColor(2,1,false));
+        g.drawPolygon(polygons[6]);
+        g.drawString("z1",215+offsetX,146+offsetY);
+        //y2  200 - 140 , 260 - 200
+        g.setColor(Color.black);
+        g.fillPolygon(polygons[5]);
+        g.setColor(getColor(1,1,false));
+        g.drawPolygon(polygons[5]);
+        g.drawString("y1",163+offsetX,236+offsetY);
+        //w2  200 - 140 , 200 - 140
+        g.setColor(Color.black);
+        g.fillPolygon(polygons[7]);
+        g.setColor(getColor(3,1,false));
+        g.drawPolygon(polygons[7]);
+        g.drawString("w1",163+offsetX,176+offsetY);
+        //x2  170 - 90  , 230 - 170
+        g.setColor(Color.black);
+        g.fillPolygon(polygons[4]);
+        g.setColor(getColor(0,1,false));
+        g.drawPolygon(polygons[4]);
+        g.drawString("x1",215+offsetX,206+offsetY);
+        //z0  150 - 90 , 230 - 170
+        g.setColor(Color.black);
+        g.fillPolygon(polygons[2]);
+        g.setColor(getColor(2,0,false));
+        g.drawPolygon(polygons[2]);
+        g.drawString("z0",110+offsetX,206+offsetY);
+        //y0  200 - 140 ,  140 - 60
+        g.setColor(Color.black);
+        g.fillPolygon(polygons[1]);
+        g.setColor(getColor(1,0,false));
+        g.drawPolygon(polygons[1]);
+        g.drawString("y0",163+offsetX,116+offsetY);
+        g.setColor(Color.white);
     }
     public void paintHyper(Graphics2D g){
         g.drawRect(50, 50, 240, 240);
         g.drawString("Hyper Net",50, 315);
-        int[] px;
-        int[] py;
 
         //w0
         g.setColor(Color.black);
@@ -425,26 +463,26 @@ public class State {
             g.drawPolygon(polygons[8]);
             g.drawString(cubeName(cubeDepth, cubeAxis), 90, 385);
 
-            //Addresses[address][0=depth,1=axis]
             offsetX = 160;
             offsetY = 375;
             g.setColor(Color.black);
             g.fillPolygon(polygons[9]);
             g.setColor(getColorNet(1));
             g.drawPolygon(polygons[9]);
-            g.drawString(cubeNames[1], 50 + offsetX, 90 + offsetY);
+            g.drawString("1", 50 + offsetX, 90 + offsetY);
 
             g.setColor(Color.black);
             g.fillPolygon(polygons[10]);
             g.setColor(getColorNet(3));
             g.drawPolygon(polygons[10]);
-            g.drawString(cubeNames[3], 70 + offsetX, 50 + offsetY);
+            g.drawString("3", 70 + offsetX, 50 + offsetY);
+
 
             g.setColor(Color.black);
             g.fillPolygon(polygons[11]);
             g.setColor(getColorNet(4));
             g.drawPolygon(polygons[11]);
-            g.drawString(cubeNames[4], 25 + offsetX, 50 + offsetY);
+            g.drawString("4", 25 + offsetX, 50 + offsetY);
 
             offsetX = 80;
             offsetY = 435;
@@ -452,22 +490,23 @@ public class State {
             g.fillPolygon(polygons[12]);
             g.setColor(getColorNet(5));
             g.drawPolygon(polygons[12]);
-            g.drawString(cubeNames[5], 70 + offsetX, 70 + offsetY);
+            g.drawString("5", 70 + offsetX, 70 + offsetY);
 
             g.setColor(Color.black);
             g.fillPolygon(polygons[13]);
             g.setColor(getColorNet(2));
             g.drawPolygon(polygons[13]);
-            g.drawString(cubeNames[2], 25 + offsetX, 70 + offsetY);
+            g.drawString("2", 25 + offsetX, 70 + offsetY);
 
             g.setColor(Color.black);
             g.fillPolygon(polygons[14]);
             g.setColor(getColorNet(0));
             g.drawPolygon(polygons[14]);
-            g.drawString(cubeNames[0], 45 + offsetX, 30 + offsetY);
+            g.drawString("0", 45 + offsetX, 30 + offsetY);
         }
         g.setColor(Color.white);
     }
+
     private int[][] getDisplayNet(int depth, int axis) {
         //fill net from boardStates
         int[] columnXa = {1,1,2,2,3,3};
@@ -541,6 +580,16 @@ public class State {
         if(load>=0){
             load--;
         }
+        if(flash>=0){
+            flash--;
+        } else {
+            flash=60;
+        }
+    }
+    public void reloadCubeNet() {
+        cubeNet=getNet(cubeDepth,cubeAxis);
+        cubeAddresses = getDisplayNet(cubeDepth,cubeAxis);
+        load=15;
     }
     public void mouseClicked(MouseEvent e) {
         boolean click = true;
@@ -578,41 +627,12 @@ public class State {
             //w0  270 - 70  , 270 - 70
             cubeAxis=3;
             cubeDepth=0;
-        } else if((mosX<(160+100)&&mosX>(160))&&(mosY<(375+110)&&mosY>(375+60))){
-            //f1
-            cubeAxis=cubeAddresses[1][1];
-            cubeDepth=cubeAddresses[1][0];
-        } else if((mosX<(160+100)&&mosX>(160+50))&&(mosY<(375+85)&&mosY>(375-25))) {
-            //f3
-            cubeAxis = cubeAddresses[3][1];
-            cubeDepth = cubeAddresses[3][0];
-        } else if((mosX<(160+50)&&mosX>(160))&&(mosY<(375+85)&&mosY>(375-25))) {
-            //f4
-            cubeAxis = cubeAddresses[4][1];
-            cubeDepth = cubeAddresses[4][0];
-        } else if((mosX<(80+100)&&mosX>(80+50))&&(mosY<(435+110)&&mosY>(435+50))) {
-            //f5
-            cubeAxis = cubeAddresses[5][1];
-            cubeDepth = cubeAddresses[5][0];
-        } else if((mosX<(80+50)&&mosX>(80))&&(mosY<(435+110)&&mosY>(435+50))) {
-            //f2
-            cubeAxis = cubeAddresses[2][1];
-            cubeDepth = cubeAddresses[2][0];
-        } else if((mosX<(80+100)&&mosX>(80))&&(mosY<(435+50)&&mosY>(435))) {
-            //f0
-            cubeAxis = cubeAddresses[0][1];
-            cubeDepth = cubeAddresses[0][0];
         } else {
             click=false;
-            randomizer(4);
         }
         if(click) {
-
             cubeNet=getNet(cubeDepth,cubeAxis);
             cubeAddresses = getDisplayNet(cubeDepth,cubeAxis);
-            for(int i=0;i<6;i++){
-                cubeNames[i] = cubeName(cubeAddresses[i][0],cubeAddresses[i][1]);
-            }
             load=15;
         }
     }

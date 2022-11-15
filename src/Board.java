@@ -13,10 +13,8 @@ public class Board {
     int mosY;
     int boardX;
     int boardY;
-    int winX1;
-    int winX2;
-    int winY1;
-    int winY2;
+    int load;
+    int maxLoad=40;
 
     public Board() {
         hyper = new char[3][3][3][3];
@@ -73,7 +71,6 @@ public class Board {
         }
         load(me);
     }
-
 
     public char[][] loadGeneric( Faces face){
         char[][] raw = new char[3][3];
@@ -303,19 +300,28 @@ public class Board {
                 }
             }
         }
+        /*
+        System.out.println("");
+        for(int i=0;i<3;i++){
+            System.out.print("[Board] ");
+            for(int j=0;j<3;j++){
+                System.out.print(" " + raw[i][j]);
+            }
+            System.out.println("");
+        }
+        */
         return raw;
     }
     public void load( Faces face) {
         System.out.println("");
         System.out.println("[Board] Loading " + face);
         board = loadGeneric(face);
-        check();
         me = face;
+        load=maxLoad;
+        check();
     }
-    public char checkGeneric( Faces face) {
-        char win = ' ';
-        char[][] raw = loadGeneric(face);
-
+    public char checkGeneric( char[][] raw) {
+        char win = '-';
         System.out.println("");
         //check diagonal 1
         if (isWon(raw[0][0])) {
@@ -355,67 +361,18 @@ public class Board {
         }
         if (isWon(win)) {
             // somebody won
-            System.out.println("[Board] Board " + face + " won by " + win);
+            System.out.println("[Board] Board won by " + win);
             return win;
         } else {
             // nobody won
-            System.out.println("[Board] Board " + face + " not won");
+            System.out.println("[Board] Board not won");
             return win;
         }
     }
+
     public void check() {
-        //check diagonal 1
-        state = '-';
-        if (isWon(board[0][0])) {
-            if (board[0][0] == board[1][1]) {
-                if (board[0][0] == board[2][2]) {
-                    state = board[0][0];
-                    winX1=0;
-                    winX2=2;
-                    winY1=0;
-                    winY2=2;
-                }
-            }
-        }
-        //check diagonal 2
-        if (isWon(board[0][2])) {
-            if (board[0][2] == board[1][1]) {
-                if (board[0][2] == board[2][0]) {
-                    state = board[0][2];
-                    winX1=0;
-                    winX2=2;
-                    winY1=2;
-                    winY2=0;
-                }
-            }
-        }
-        for (int a = 0; a < 3; a++) {
-            //check vertical
-            if (isWon(board[a][0])) {
-                if (board[a][0] == board[a][1]) {
-                    if (board[a][0] == board[a][2]) {
-                        state = board[a][0];
-                        winX1=a;
-                        winX2=a;
-                        winY1=0;
-                        winY2=2;
-                        break;
-                    }
-                }
-            }
-            //check horizontal
-            if (isWon(board[0][a])) {
-                if (board[0][a] == board[1][a]) {
-                    if (board[0][a] == board[2][a]) {
-                        state = board[0][a];
-                        winX1=0;
-                        winX2=2;
-                        winY1=a;
-                        winY2=a;
-                        break;
-                    }
-                }
-            }
+        if(!isWon(state)){
+            state = checkGeneric(board);
         }
     }
     public void save(){
@@ -655,46 +612,121 @@ public class Board {
         return state;
     }
 
-    public void paintBoard(Graphics2D g) {
-        if(isWon(state)){
-            if(state=='x'){
-                g.setColor(Color.red);
-            } else {
-                g.setColor(Color.blue);
-            }
-            g.setStroke(new BasicStroke(5));
-            g.drawLine(winX1*160+420,winY1*160+130,winX2*160+420,winY2*160+130);
-            g.setStroke(new BasicStroke(1));
-        } else {
-            g.setColor(Color.white);
-        }
-        g.drawRect(340, 50, 480, 480);
-        g.drawRect(340, 210, 480, 160);
-        g.drawRect(500, 50, 160, 480);
-        for(int x=0;x<3;x++){
-            for(int y=0;y<3;y++){
-                //System.out.print(board[x][y]);
-                if(isWon(board[x][y])){
-                    g.setFont(new Font("Courier",Font.PLAIN,80));
-                    if(board[x][y]=='x'){
-                        g.setColor(Color.red);
-                    } else {
-                        g.setColor(Color.blue);
+    public void paintWin(Graphics2D g){
+        int winX1=0;
+        int winX2=0;
+        int winY1=0;
+        int winY2=0;
+        //check diagonal 1
+        if (isWon(board[0][0])) {
+            if (board[0][0] == board[1][1]) {
+                if (board[0][0] == board[2][2]) {
+                    if(board[0][0]==state) {
+                        winX1 = 0;
+                        winX2 = 2;
+                        winY1 = 0;
+                        winY2 = 2;
                     }
-                    g.drawString("" + board[x][y],(x*160+393),(y*160+153));
                 }
             }
         }
-        g.setColor(Color.white);
-        g.setFont(new Font("Courier",Font.PLAIN,15));
+        //check diagonal 2
+        if (isWon(board[0][2])) {
+            if (board[0][2] == board[1][1]) {
+                if (board[0][2] == board[2][0]) {
+                    if(board[0][2]==state) {
+                        winX1 = 0;
+                        winX2 = 2;
+                        winY1 = 2;
+                        winY2 = 0;
+                    }
+                }
+            }
+        }
+        for (int a = 0; a < 3; a++) {
+            //check vertical
+            if (isWon(board[a][0])) {
+                if (board[a][0] == board[a][1]) {
+                    if (board[a][0] == board[a][2]) {
+                        if(board[a][0]==state) {
+                            winX1 = a;
+                            winX2 = a;
+                            winY1 = 0;
+                            winY2 = 2;
+                            break;
+                        }
+                    }
+                }
+            }
+            //check horizontal
+            if (isWon(board[0][a])) {
+                if (board[0][a] == board[1][a]) {
+                    if (board[0][a] == board[2][a]) {
+                        if(board[0][a]==state) {
+                            winX1 = 0;
+                            winX2 = 2;
+                            winY1 = a;
+                            winY2 = a;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        g.setStroke(new BasicStroke(5));
+        g.drawLine(winX1*160+420,winY1*160+130,winX2*160+420,winY2*160+130);
+        g.setStroke(new BasicStroke(1));
+    }
+    public void paintBoard(Graphics2D g) {
+        if(load<maxLoad/2) {
+            Color winState;
+            if (isWon(state)) {
+                if (state == 'x') {
+                    winState = Color.red;
+                } else {
+                    winState = Color.blue;
+                }
+                g.setColor(winState);
+                paintWin(g);
+            } else {
+                winState = Color.white;
+                g.setColor(winState);
+            }
+            g.drawRect(340, 50, 480, 480);
+            g.drawRect(340, 210, 480, 160);
+            g.drawRect(500, 50, 160, 480);
+            for (int x = 0; x < 3; x++) {
+                for (int y = 0; y < 3; y++) {
+                    //System.out.print(board[x][y]);
+                    if (isWon(board[x][y])) {
+                        g.setFont(new Font("Courier", Font.PLAIN, 80));
+                        if (board[x][y] == 'x') {
+                            g.setColor(Color.red);
+                        } else {
+                            g.setColor(Color.blue);
+                        }
+                        g.drawString("" + board[x][y], (x * 160 + 393), (y * 160 + 153));
+                    }
 
+                    g.setColor(winState);
+                    g.setFont(new Font("Courier", Font.PLAIN, 15));
+                    g.drawString("" + reverseAxis(me.A, x) + ", " + reverseAxis(me.B, y), (x * 160 + 345), (y * 160 + 70));
+                }
+            }
+            g.setColor(Color.white);
+            g.setFont(new Font("Courier", Font.PLAIN, 15));
+        }
     }
     public void paintInfo(Graphics2D g) {
         g.setColor(Color.white);
         g.drawLine(340,580,340+480,580);
         g.setFont(new Font("Courier",Font.PLAIN,25));
         g.drawString("Board ",340, 580-15);
-        g.setColor(Color.yellow);
+        if(load<maxLoad/2) {
+            g.setColor(Color.yellow);
+        } else {
+            g.setColor(Color.black);
+        }
         g.drawString("      " + me.toString(),340, 580-15);
         g.setColor(Color.white);
         g.drawString("State ",660, 580-15);
@@ -704,6 +736,9 @@ public class Board {
             } else {
                 g.setColor(Color.blue);
             }
+        }
+        if(!(load<maxLoad/2)) {
+            g.setColor(Color.black);
         }
         g.drawString("      " + Character.toUpperCase(state),660, 580-15);
         g.setColor(Color.white);
@@ -718,27 +753,41 @@ public class Board {
         g.setColor(Color.white);
     }
     public void updateComponent() {
-
-    }
-    public void mouseClicked(MouseEvent e){
-        mosX=e.getX();
-        mosY=e.getY();
-        if(!((mosX>820)||(mosX<340)||(mosY>530)||(mosY<50))) {
-            boardX = (mosX - 340) / 160;
-            if (boardX > 2) {
-                boardX = 2;
-            }
-            if (boardX < 0) {
-                boardX = 0;
-            }
-            boardY = (mosY - 50) / 160;
-            if (boardY > 2) {
-                boardY = 2;
-            }
-            if (boardY < 0) {
-                boardY = 0;
-            }
-            System.out.println("[Board] Clicked " + boardX + " " + boardY);
+        if(load>0){
+            load--;
         }
+    }
+    public boolean mouseClicked(MouseEvent e) {
+        if (!isWon(state)) {
+            System.out.println("[Board] " + me + " not won, proceeding");
+            mosX = e.getX();
+            mosY = e.getY();
+            Rectangle bounds = new Rectangle(340, 50, 480, 480);
+            if (bounds.contains(mosX, mosY)) {
+                System.out.println("[Board] Mouse within bounds, proceeding");
+                boardX = (mosX - 340) / 160;
+                boardY = (mosY - 50) / 160;
+                if (!isWon(board[boardX][boardY])) {
+                    System.out.println("[Board] Position " + boardX + " " + boardY + " not occupied, proceeding");
+                    board[boardX][boardY] = playr;
+                    System.out.println("[Board] Played " + playr + " at Position " + boardX + " " + boardY);
+                    save();
+                    check();
+                    if(playr=='x'){
+                        playr='o';
+                    } else {
+                        playr='x';
+                    }
+                    return isWon(state);
+                } else {
+                    System.out.println("[Board] Position " + boardX + " " + boardY + " occupied, canceling");
+                }
+            } else {
+                System.out.println("[Board] Mouse not within bounds, canceling");
+            }
+        } else {
+            System.out.println("[Board] " + me + " won, canceling");
+        }
+        return false;
     }
 }
