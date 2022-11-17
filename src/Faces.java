@@ -42,10 +42,6 @@ public class Faces {
             return Character.toUpperCase(ch);
         }
     }
-    private void rotationLogger(Faces face) {
-        //System.out.println("");
-        //System.out.println("[Faces] Rotating from " + this + " to " + face);
-    }
     public char flatten(char ch) {
         return Character.toLowerCase(ch);
     }
@@ -57,13 +53,11 @@ public class Faces {
         }
     }
 
-
     public void define(char axisA,char axisB,char depthC,char depthD) {
         A = axisA;
         B = axisB;
         C = depthC;
         D = depthD;
-        System.out.println("");
         System.out.println("[Faces] Defined Face " + this);
         curr = toPolygon();
     }
@@ -72,8 +66,6 @@ public class Faces {
         B = face.B;
         C = face.C;
         D = face.D;
-        System.out.println("");
-        System.out.println("[Faces] Defined Face " + face);
         curr = toPolygon();
     }
 
@@ -88,21 +80,6 @@ public class Faces {
         }
         throw new IllegalArgumentException("Impossible!");
     }
-    public Faces rotateRandom(){
-        Random ran = new Random();
-        int r = ran.nextInt(4);
-        Faces face;
-        if( r == 0) {
-            face = rotateAC(ran.nextInt(2)==0);
-        } else if( r == 1) {
-            face = rotateAD(ran.nextInt(2)==0);
-        } else if( r == 2) {
-            face = rotateBC(ran.nextInt(2)==0);
-        } else {
-            face = rotateBD(ran.nextInt(2)==0);
-        }
-        return face;
-    }
     public Faces rotateAC( boolean clockwise) {
         Faces Next = new Faces();
         Next.A = A;
@@ -115,7 +92,6 @@ public class Faces {
             Next.C = flipCase(B);
             Next.B = C;
         }
-        rotationLogger(Next);
         return Next;
     }
     public Faces rotateAD( boolean clockwise) {
@@ -130,7 +106,6 @@ public class Faces {
             Next.D = flipCase(B);
             Next.B = D;
         }
-        rotationLogger(Next);
         return Next;
     }
     public Faces rotateBC( boolean clockwise) {
@@ -145,7 +120,6 @@ public class Faces {
             Next.C = flipCase(A);
             Next.A = C;
         }
-        rotationLogger(Next);
         return Next;
     }
     public Faces rotateBD( boolean clockwise) {
@@ -160,7 +134,6 @@ public class Faces {
             Next.D = flipCase(A);
             Next.A = D;
         }
-        rotationLogger(Next);
         return Next;
     }
 
@@ -471,10 +444,13 @@ public class Faces {
             Faces face = new Faces();
         for (NavButton button : buttons) {
             if (button.rectangle.contains(mosX, mosY)) {
+                System.out.println();
+                System.out.println("Rotating...");
                 face.set(rotate(button.axisDepth, button.clockwise));
                 next = face.rotate(button.axisDepth, button.clockwise).toPolygon();
                 nextName = face.rotate(button.axisDepth, button.clockwise).toString();
                 load=maxLoad/2;
+                System.out.println("[Faces] Rotating from " + this + " to " + face + "...");
                 set(face);
                 return true;
             }
@@ -500,14 +476,14 @@ public class Faces {
     final static int xOffset = 870;
     final static int yOffset = 340;
     static NavButton[] buttons = {
-        new NavButton(60 + xOffset, yOffset, AxisDepth.AC, true),
-        new NavButton(120 + xOffset, yOffset, AxisDepth.AD, true),
-        new NavButton(60+xOffset,180+yOffset,AxisDepth.AC,false),
-        new NavButton(120 + xOffset, 180 + yOffset, AxisDepth.AD, false),
-        new NavButton(xOffset,60+yOffset,AxisDepth.BC,true),
-        new NavButton(xOffset,120+yOffset,AxisDepth.BD,true),
-        new NavButton(180+xOffset,60+yOffset,AxisDepth.BC,false),
-        new NavButton(180+xOffset,120+yOffset,AxisDepth.BD,false)
+        new NavButton(60 + xOffset, yOffset, AxisDepth.AC, false),
+        new NavButton(120 + xOffset, yOffset, AxisDepth.AD, false),
+        new NavButton(60+xOffset,180+yOffset,AxisDepth.AC,true),
+        new NavButton(120 + xOffset, 180 + yOffset, AxisDepth.AD, true),
+        new NavButton(xOffset,60+yOffset,AxisDepth.BC,false),
+        new NavButton(xOffset,120+yOffset,AxisDepth.BD,false),
+        new NavButton(180+xOffset,60+yOffset,AxisDepth.BC,true),
+        new NavButton(180+xOffset,120+yOffset,AxisDepth.BD,true)
     };
 
     static class NavButton {

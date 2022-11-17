@@ -16,7 +16,9 @@ public class Game extends JPanel implements MouseListener, MouseMotionListener {
 
     public Game() {
         setBackground(Color.black);
-        faces.define('X','Y','Z','W');
+        System.out.println();
+        System.out.println("Starting Game...");
+        faces.define('X','Y','z','w');
         board.load(faces);
         board.setState(state.get(faces));
         addMouseListener(new MouseListener() {
@@ -25,15 +27,17 @@ public class Game extends JPanel implements MouseListener, MouseMotionListener {
             public void mouseClicked(MouseEvent e) {
                 if(!end) {
                     if (faces.mouseClicked(e)) {
-                        board.load(faces);
                         board.setState(state.get(faces));
-                        board.check();
+                        board.load(faces);
                     }
                     if (board.mouseClicked(e)) {
                         state.set(faces, board.getState());
                         checkAdjacentSides();
                         state.checkGame();
-                        state.reloadCubeNet();
+                        System.out.println("[Gayme] Reloading Cube Net...");
+                        state.reloadCubeNet(false);
+                        System.out.println();
+                        board.load(faces);
                     }
                     state.mouseClicked(e);
                 } else {
@@ -46,6 +50,9 @@ public class Game extends JPanel implements MouseListener, MouseMotionListener {
                         restart();
                     }
                 }
+                ball1.mouseClicked(e);
+                ball2.mouseClicked(e);
+                ball3.mouseClicked(e);
             }
 
             @Override
@@ -104,15 +111,23 @@ public class Game extends JPanel implements MouseListener, MouseMotionListener {
             ball3.paint(g);
             if(state.hyper=='x'){
                 g2d.setColor(Color.red);
-            } else {
+            } else if(state.hyper=='o'){
                 g2d.setColor(Color.blue);
+            } else {
+                g2d.setColor(Color.darkGray);
             }
             g2d.setFont(new Font("Courier", Font.PLAIN, 80));
             g2d.drawString("Game Over", 360,240);
             g2d.setFont(new Font("Courier", Font.PLAIN, 21));
-            g2d.drawString("                                " + Character.toUpperCase(state.hyper), 360,270);
-            g2d.setColor(Color.white);
-            g2d.drawString("Tic Tac Tesseract won by Player ", 360,270);
+            if(state.hyper!='s') {
+                g2d.drawString("                                " + Character.toUpperCase(state.hyper), 360, 270);
+                g2d.setColor(Color.white);
+                g2d.drawString("Tic Tac Tesseract won by Player ", 360, 270);
+            } else {
+                g2d.drawString("                         Stalemate", 360, 270);
+                g2d.setColor(Color.white);
+                g2d.drawString("Tic Tac Tesseract end in ", 360, 270);
+            }
             state.paintEnd(g2d);
             g2d.drawString("Play Again?                   /  ", 360,565);
             g2d.setColor(Color.red);
@@ -122,14 +137,17 @@ public class Game extends JPanel implements MouseListener, MouseMotionListener {
         }
     }
     public boolean isWon() {
-        return (state.hyper=='x'||state.hyper=='o');
+        return (state.hyper=='x'||state.hyper=='o'||state.hyper=='s');
     }
     private void checkSide(Faces side) {
+        System.out.println("[Gayme] Checking " + side + "...");
         if (!state.check(side)){
             state.set(side,board.checkGeneric(board.loadGeneric(side)));
         }
     }
     private void checkAdjacentSides() {
+        System.out.println();
+        System.out.println("Checking adjacent Boards...");
         checkSide(faces.rotateAC(true));
         checkSide(faces.rotateAD(true));
         checkSide(faces.rotateAC(false));
@@ -150,14 +168,20 @@ public class Game extends JPanel implements MouseListener, MouseMotionListener {
             if(!end){
                 state.endGamePolygons();
                 end=true;
+                System.out.println();
+                System.out.println("Game Over");
+
             }
         }
     }
     private void restart() {
+        System.out.println();
+
+        System.out.println("Restarting Game...");
         state = new State();
         board = new Board();
         faces= new Faces();
-        faces.define('X','Y','Z','W');
+        faces.define('X','Y','z','w');
         board.load(faces);
         board.setState(state.get(faces));
         end=false;
@@ -167,7 +191,7 @@ public class Game extends JPanel implements MouseListener, MouseMotionListener {
         JFrame window = new JFrame("Tic Tac Tesseract");
         Game game = new Game();
         window.add(game);
-        window.setSize( new Dimension(1160, 670));
+            window.setSize( new Dimension(1160, 670));
         window.setVisible(true);
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         while(!game.stop) {
@@ -176,8 +200,6 @@ public class Game extends JPanel implements MouseListener, MouseMotionListener {
             Thread.sleep(10);
         }
         window.dispose();
-
-
     }
 
     @Override

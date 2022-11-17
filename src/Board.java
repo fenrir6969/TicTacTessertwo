@@ -46,30 +46,13 @@ public class Board {
     public boolean isWon(char state) {
         return (state == 'x')||(state=='o');
     }
-    public void randomizer(int randomness){
-        hyper = new char[3][3][3][3];
-        board = new char[3][3];
-        Random ran = new Random();
-        for(int w = 0; w < 3; w++) {
-            for(int y = 0; y < 3; y++) {
-                for(int x = 0; x < 3; x++) {
-                    for(int z = 0; z < 3; z++) {
-                        int r = ran.nextInt(randomness);
-                        if (r == 0) {
-                            hyper[x][y][z][w] = 'x';
-                            System.out.print('x');
-                        } else if (r == 1) {
-                            hyper[x][y][z][w] = 'o';
-                            System.out.print('o');
-                        } else {
-                            hyper[x][y][z][w] = '-';
-                            System.out.print('-');
-                        }
-                    }
-                }
+    public boolean conflicting(char state1, char state2){
+        if(isWon(state1)&&isWon(state2)) {
+            if (state1 != state2) {
+                return true;
             }
         }
-        load(me);
+        return false;
     }
 
     public char[][] loadGeneric( Faces face){
@@ -300,29 +283,24 @@ public class Board {
                 }
             }
         }
-        /*
-        System.out.println("");
-        for(int i=0;i<3;i++){
-            System.out.print("[Board] ");
-            for(int j=0;j<3;j++){
-                System.out.print(" " + raw[i][j]);
-            }
-            System.out.println("");
-        }
-        */
         return raw;
     }
     public void load( Faces face) {
-        System.out.println("");
-        System.out.println("[Board] Loading " + face);
         board = loadGeneric(face);
+        System.out.println("[Board] Loading " + face + "...");
+        for(int i=0;i<3;i++){
+            System.out.print("[Board]   ");
+            for(int j=0;j<3;j++){
+                System.out.print(" " + board[j][i]);
+            }
+            System.out.println("");
+        }
         me = face;
         load=maxLoad;
         check();
     }
     public char checkGeneric( char[][] raw) {
-        char win = '-';
-        System.out.println("");
+        char win='-';
         //check diagonal 1
         if (isWon(raw[0][0])) {
             if (raw[0][0] == raw[1][1]) {
@@ -361,23 +339,55 @@ public class Board {
         }
         if (isWon(win)) {
             // somebody won
-            System.out.println("[Board] Board won by " + win);
-            return win;
+            System.out.println("[Board] Board won by " + state);
         } else {
             // nobody won
+            if(checkStalemate(raw)){
+                System.out.println("[Board] Board in stalemate");
+                win = 's';
+            }
             System.out.println("[Board] Board not won");
-            return win;
         }
+        return win;
     }
-
     public void check() {
+        System.out.println("[Board] Checking " + me + "...");
         if(!isWon(state)){
             state = checkGeneric(board);
+        } else {
+            System.out.println("[Board] Board already won by " + state);
         }
     }
+    public boolean checkStalemate( char[][] raw) {
+        //Diagonal 1
+        if(!(conflicting(raw[0][0],raw[1][1])||conflicting(raw[2][2],raw[1][1])||conflicting(raw[0][0],raw[2][2]))){
+            return false;
+        }
+        //Diagonal 2
+        if(!(conflicting(raw[0][2],raw[1][1])||conflicting(raw[2][0],raw[1][1])||conflicting(raw[2][0],raw[0][2]))){
+            return false;
+        }
+        for(int a=0;a<3;a++){
+            //Vertical
+            if(!(conflicting(raw[a][0],raw[a][1])||conflicting(raw[a][2],raw[a][1])||conflicting(raw[a][0],raw[a][2]))){
+                return false;
+            }
+            //Horizontal
+            if(!(conflicting(raw[0][a],raw[1][a])||conflicting(raw[2][a],raw[1][a])||conflicting(raw[0][a],raw[2][a]))){
+                return false;
+            }
+        }
+        return true;
+    }
     public void save(){
-        System.out.println("");
-        System.out.println("[Board] Saving " + me);
+        System.out.println("[Board] Saving " + me + "...");
+        for(int i=0;i<3;i++){
+            System.out.print("[Board]   ");
+            for(int j=0;j<3;j++){
+                System.out.print(" " + board[j][i]);
+            }
+            System.out.println("");
+        }
         int d = evaluate(me.D);
         int c = evaluate(me.C);
         if(checkChars(me.A,'x')){
@@ -689,7 +699,11 @@ public class Board {
                 g.setColor(winState);
                 paintWin(g);
             } else {
-                winState = Color.white;
+                if (state == 's') {
+                    winState = Color.darkGray;
+                } else {
+                    winState = Color.white;
+                }
                 g.setColor(winState);
             }
             g.drawRect(340, 50, 480, 480);
@@ -704,6 +718,9 @@ public class Board {
                             g.setColor(Color.red);
                         } else {
                             g.setColor(Color.blue);
+                        }
+                        if ( state=='s'){
+                            g.setColor(Color.darkGray);
                         }
                         g.drawString("" + board[x][y], (x * 160 + 393), (y * 160 + 153));
                     }
@@ -736,6 +753,10 @@ public class Board {
             } else {
                 g.setColor(Color.blue);
             }
+        } else {
+            if(state=='s'){
+                g.setColor(Color.darkGray);
+            }
         }
         if(!(load<maxLoad/2)) {
             g.setColor(Color.black);
@@ -759,18 +780,18 @@ public class Board {
     }
     public boolean mouseClicked(MouseEvent e) {
         if (!isWon(state)) {
-            System.out.println("[Board] " + me + " not won, proceeding");
             mosX = e.getX();
             mosY = e.getY();
             Rectangle bounds = new Rectangle(340, 50, 480, 480);
             if (bounds.contains(mosX, mosY)) {
-                System.out.println("[Board] Mouse within bounds, proceeding");
+                System.out.println();
                 boardX = (mosX - 340) / 160;
                 boardY = (mosY - 50) / 160;
+                System.out.println("Playing...");
+                System.out.println("[Board] Checking " + boardX + ", " + boardY + "...");
                 if (!isWon(board[boardX][boardY])) {
-                    System.out.println("[Board] Position " + boardX + " " + boardY + " not occupied, proceeding");
                     board[boardX][boardY] = playr;
-                    System.out.println("[Board] Played " + playr + " at Position " + boardX + " " + boardY);
+                    System.out.println("[Board] Playing" + Character.toUpperCase(playr));
                     save();
                     check();
                     if(playr=='x'){
@@ -778,15 +799,11 @@ public class Board {
                     } else {
                         playr='x';
                     }
-                    return isWon(state);
+                    return true;
                 } else {
-                    System.out.println("[Board] Position " + boardX + " " + boardY + " occupied, canceling");
+                    System.out.println("[Board] Position occupied");
                 }
-            } else {
-                System.out.println("[Board] Mouse not within bounds, canceling");
             }
-        } else {
-            System.out.println("[Board] " + me + " won, canceling");
         }
         return false;
     }

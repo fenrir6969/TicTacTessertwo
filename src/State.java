@@ -11,13 +11,12 @@ public class State {
 
     int mosX;
     int mosY;
-    int cubeAxis;
-    int cubeDepth;
+    int cubeAxis=2;
+    int cubeDepth=0;
     char[] cubeNet = new char[6];
     int load;
     int flash;
     Polygon[] polygons;
-    int[][] cubeAddresses = new int[6][2];
 
     public State(){
         board = new char[3][3][3][3];
@@ -64,31 +63,46 @@ public class State {
         int[] columnB = {1, 1, 0, 2, 1, 1};
         int[] columnC = {1, 1, 1, 1, 0, 2};
         char[] net = new char[6];
-        System.out.println();
-        System.out.println("[State] Retrieving cube " + cubeName(depth,axis));
         if (axis == 0) {
             for (int i = 0; i < 6; i++) {
                 net[i] = board[depth*2][columnA[i]][columnB[i]][flip(columnC[i],depth)];
-                System.out.println("[State] Net " + i + ": " + depth*2 + " " + columnA[i] + " " + columnB[i] + " " + flip(columnC[i],depth) + " : " + net[i]);
+                //System.out.println("[State] Net " + i + ": " + depth*2 + " " + columnA[i] + " " + columnB[i] + " " + flip(columnC[i],depth) + " : " + net[i]);
             }
         } else if (axis == 1) {
             for (int i = 0; i < 6; i++) {
                 net[i] = board[columnC[i]][depth*2][columnB[i]][flip(columnA[i],depth)];
-                System.out.println("[State] Net " + i + ": " + columnC[i] + " " + depth*2 + " " + columnB[i] + " " + flip(columnA[i],depth) + " : " + net[i]);
+                //System.out.println("[State] Net " + i + ": " + columnC[i] + " " + depth*2 + " " + columnB[i] + " " + flip(columnA[i],depth) + " : " + net[i]);
             }
         } else if (axis == 2) {
             for (int i = 0; i < 6; i++) {
                 net[i] = board[columnC[i]][columnA[i]][depth*2][flip(columnB[i],depth)];
-                System.out.println("[State] Net " + i + ": " + columnC[i] + " " + columnA[i] + " " + depth*2 + " " + flip(columnB[i],depth) + " : " + net[i]);
+                //System.out.println("[State] Net " + i + ": " + columnC[i] + " " + columnA[i] + " " + depth*2 + " " + flip(columnB[i],depth) + " : " + net[i]);
             }
         } else {
             for (int i = 0; i < 6; i++) {
                 net[i] = board[columnC[i]][columnA[i]][columnB[i]][depth*2];
-                System.out.println("[State] Net " + i + ": " + columnC[i] + " " + columnA[i] + " " + columnB[i] + " " + depth*2 + " : " + net[i]);
+                //System.out.println("[State] Net " + i + ": " + columnC[i] + " " + columnA[i] + " " + columnB[i] + " " + depth*2 + " : " + net[i]);
             }
+        }
+        System.out.print("[State]   ");
+        for(int i=0;i<3;i++){
+            System.out.print(" " + net[i*2] + net[i*2+1]);
         }
         System.out.println();
         return net;
+    }
+
+    public boolean conflicting(char state1, char state2){
+        if(isWon(state1)&&isWon(state2)){
+            if(state1 != state2){
+                return true;
+            }
+            return false;
+        } else if (state1 == 's' || state2 == 's'){
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public char get( Faces face) {
@@ -126,7 +140,6 @@ public class State {
                 state = board[1][1][evaluate(face.D)][evaluate(face.C)];
             }
         }
-        System.out.println("[State] BoardState " + face + " is " + state);
         return state;
     }
     public void set( Faces face, char state) {
@@ -163,43 +176,65 @@ public class State {
                 board[1][1][evaluate(face.D)][evaluate(face.C)] = state;
             }
         }
-        System.out.println("[State] BoardState " + face + " set to " + state);
+        System.out.println("[State] " + face + " set to " + state);
     }
     public boolean check( Faces face) {
         return isWon(get(face));
     }
-    public void checkCube(int depth, int axis) {
-        System.out.println("");
-        //check if already won or not
-        if (!isWon(cubes[depth][axis])) {
-            char[] net = getNet(depth,axis);
-            //checks cube for victory, updates its position in cubeStates
+    public boolean checkStalemate(int depth, int axis, char[] net) {
+        if(cubes[depth][axis]!='s') {
             for (int i = 0; i < 3; i++) {
-                char side = net[i*2];
-                char opposite = net[(i*2)+1];
-                if (isWon(side)) {
-                    if (side == opposite) {
-                        for (int j = 0; j < 6; j++) {
-                            if ((j != i * 2) && (j != i * 2 + 1)) {
-                                if (net[j] == side) {
-                                    cubes[depth][axis] = side;
-                                }
+                if (!conflicting(net[i * 2], net[i * 2 + 1])) {
+                    for (int j = 0; j < 6; j++) {
+                        if (j != i * 2 && j != i * 2 + 1) {
+                            if (!conflicting(net[i * 2], net[j])) {
+                                System.out.println("[State] Cube " + cubeName(depth,axis) + " not in stalemate");
+                                return false;
                             }
                         }
                     }
                 }
             }
-            if (isWon(cubes[depth][axis])) {
-                //someone won outcome
-                System.out.println("[State] Cube " + cubeName(depth,axis) + " won by " + cubes[depth][axis]);
-            } else {
-                //no change outcome
-                System.out.println("[State] Cube " + cubeName(depth,axis) + " not won");
-            }
+            cubes[depth][axis] = 's';
+            System.out.println("[State] Cube " + cubeName(depth,axis) + " in stalemate");
+            System.out.println("[State] " + cubeName(depth, axis) + " set to s");
         }
-        else {
-            //already won outcome
-            System.out.println("[State] Ccube " + cubeName(depth,axis) + " already won by " + cubes[depth][axis]);
+        return true;
+    }
+    public void checkCube(int depth, int axis) {
+        //check if already won or not
+        System.out.println("[State] Checking Cube " + cubeName(depth,axis) + "...");
+        char[] net = getNet(depth, axis);
+        if(!checkStalemate(depth,axis,net)) {
+            if (!isWon(cubes[depth][axis])) {
+                //checks cube for victory, updates its position in cubeStates
+                for (int i = 0; i < 3; i++) {
+                    char side = net[i * 2];
+                    char opposite = net[(i * 2) + 1];
+                    if (isWon(side)) {
+                        if (side == opposite) {
+                            for (int j = 0; j < 6; j++) {
+                                if ((j != i * 2) && (j != i * 2 + 1)) {
+                                    if (net[j] == side) {
+                                        cubes[depth][axis] = side;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if (isWon(cubes[depth][axis])) {
+                    //someone won outcome
+                    System.out.println("[State] Cube " + cubeName(depth, axis) + " won by " + cubes[depth][axis]);
+                } else {
+                    //no change outcome
+                    System.out.println("[State] Cube " + cubeName(depth, axis) + " not won");
+                }
+                System.out.println("[State] " + cubeName(depth, axis) + " set to " + cubes[depth][axis]);
+            } else {
+                //already won outcome
+                System.out.println("[State] Cube " + cubeName(depth, axis) + " already won by " + cubes[depth][axis]);
+            }
         }
     }
     public void checkHyper() {
@@ -207,46 +242,68 @@ public class State {
         String row;
 
         //print cubeStates
-        System.out.println("");
-        if(!isWon(hyper)) {
-            for (int i = 0; i < 4; i++) {
-                if (isWon(cubes[0][i])) {
-                    if (cubes[1][i] == cubes[0][i]) {
-                        for (int depth = 0; depth < 2; depth++) {
-                            for (int axis = 0; axis < 4; axis++) {
-                                if (axis != i) {
-                                    if (cubes[depth][axis] == cubes[0][i]) {
-                                        hyper = cubes[0][i];
+        System.out.println("[State]      0 1");
+        System.out.println("[State]    x " + cubes[0][0] + " " + cubes[1][0]);
+        System.out.println("[State]    y " + cubes[0][1] + " " + cubes[1][1]);
+        System.out.println("[State]    z " + cubes[0][2] + " " + cubes[1][2]);
+        System.out.println("[State]    w " + cubes[0][3] + " " + cubes[1][3]);
+        boolean stalemate = true;
+        for (int i = 0; i < 4; i++) {
+            if(!conflicting(cubes[1][i],cubes[0][i])){
+                for (int depth = 0; depth < 2; depth++) {
+                    for (int axis = 0; axis < 4; axis++) {
+                        if (axis != i) {
+                            if (!conflicting(cubes[depth][axis],cubes[0][i])){
+                                stalemate= false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if(!stalemate) {
+            if (!isWon(hyper)) {
+                for (int i = 0; i < 4; i++) {
+                    if (isWon(cubes[0][i])) {
+                        if (cubes[1][i] == cubes[0][i]) {
+                            for (int depth = 0; depth < 2; depth++) {
+                                for (int axis = 0; axis < 4; axis++) {
+                                    if (axis != i) {
+                                        if (cubes[depth][axis] == cubes[0][i]) {
+                                            hyper = cubes[0][i];
+                                        }
                                     }
                                 }
                             }
                         }
                     }
                 }
-            }
-            if(!isWon(hyper)) {
-                System.out.println("[State] Hypercube not won");
+                if (!isWon(hyper)) {
+                    System.out.println("[State] Hypercube not won");
+                } else {
+                    System.out.println("[State] Hypercube won by " + hyper);
+                }
             } else {
-                System.out.println("[State] Hypercube won by " + hyper);
+                System.out.println("[State] Hypercube already won by " + hyper);
             }
         } else {
-            System.out.println("[State] Hypercube already won by " + hyper);
+            hyper='s';
+            System.out.println("[State] Hypercube in stalemate");
         }
     }
     public void checkGame() {
         int checks = 0;
         boolean won = false;
-
-        System.out.println("");
-        System.out.println("[State] Checking Cubes...");
+        System.out.println();
+        System.out.println("Checking Game...");
         for(int axis = 0; axis<4; axis++) {
             for (int depth = 0; depth < 2; depth++) {
                 checkCube(depth, axis);
             }
         }
+        System.out.println("[State] Checking Hypercube...");
         checkHyper();
     }
-
 
     private void initializePolygons() {
         int[] px;
@@ -322,7 +379,6 @@ public class State {
         polygons[14] = new Polygon(px,py,4);
 
         cubeNet=getNet(0,0);
-        cubeAddresses = getDisplayNet(0,0);
     }
     public void endGamePolygons() {
         int offsetX=410;
@@ -507,48 +563,6 @@ public class State {
         g.setColor(Color.white);
     }
 
-    private int[][] getDisplayNet(int depth, int axis) {
-        //fill net from boardStates
-        int[] columnXa = {1,1,2,2,3,3};
-        int[] columnYa = {3,3,2,2,0,0};
-        int[] columnZa = {1,1,3,3,0,0};
-        int[] columnWa = {1,1,2,2,0,0};
-        int[] columnXd = {0,1,0,1,depth,(depth+1)%2};
-        int[] columnYd = {depth,(depth+1)%2,0,1,0,1};
-        int[] columnZd = {0,1,depth,(depth+1)%2,0,1};
-        int[] columnWd = {0,1,0,1,0,1};
-
-        int[][] net = new int[6][2];
-        System.out.println();
-        System.out.println("[State] Retrieving cube " + cubeName(depth,axis));
-        if (axis == 0) {
-            for (int i = 0; i < 6; i++) {
-                net[i][0] = columnXd[i];
-                net[i][1] = columnXa[i];
-                System.out.println("[State] Display Net " + i + ": " + cubeName(net[i][0],net[i][1]));
-            }
-        } else if (axis == 1) {
-            for (int i = 0; i < 6; i++) {
-                net[i][0] = columnYd[i];
-                net[i][1] = columnYa[i];
-                System.out.println("[State] Display Net " + i + ": " + cubeName(net[i][0],net[i][1]));
-            }
-        } else if (axis == 2) {
-            for (int i = 0; i < 6; i++) {
-                net[i][0] = columnZd[i];
-                net[i][1] = columnZa[i];
-                System.out.println("[State] Display Net " + i + ": " + cubeName(net[i][0],net[i][1]));
-            }
-        } else {
-            for (int i = 0; i < 6; i++) {
-                net[i][0] = columnWd[i];
-                net[i][1] = columnWa[i];
-                System.out.println("[State] Display Net " + i + ": " + cubeName(net[i][0],net[i][1]));
-            }
-        }
-        System.out.println();
-        return net;
-    }
     private Color getColor(int axis,int depth,boolean highlight){
         char state = cubes[depth][axis];
         if(depth==cubeDepth&&axis==cubeAxis&&highlight){
@@ -560,6 +574,8 @@ public class State {
             } else {
                 return Color.blue;
             }
+        } else if(state=='s'){
+            return Color.darkGray;
         } else {
             return Color.white;
         }
@@ -572,6 +588,8 @@ public class State {
             } else {
                 return Color.blue;
             }
+        } else if(state=='s'){
+            return Color.darkGray;
         } else {
             return Color.white;
         }
@@ -586,10 +604,11 @@ public class State {
             flash=60;
         }
     }
-    public void reloadCubeNet() {
+    public void reloadCubeNet(boolean silent) {
         cubeNet=getNet(cubeDepth,cubeAxis);
-        cubeAddresses = getDisplayNet(cubeDepth,cubeAxis);
-        load=15;
+        if(!silent){
+            load=15;
+        }
     }
     public void mouseClicked(MouseEvent e) {
         boolean click = true;
@@ -631,10 +650,10 @@ public class State {
             click=false;
         }
         if(click) {
+            System.out.println();
+            System.out.println("Changing Cube Net...");
             cubeNet=getNet(cubeDepth,cubeAxis);
-            cubeAddresses = getDisplayNet(cubeDepth,cubeAxis);
             load=15;
         }
     }
-
 }
