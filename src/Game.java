@@ -10,6 +10,7 @@ public class Game extends JPanel implements MouseListener, MouseMotionListener {
     Ball ball1 = new Ball();
     Ball ball2 = new Ball();
     Ball ball3 = new Ball();
+    Ball ball4 = new Ball();
     Faces faces = new Faces();
     boolean stop = false;
     boolean end = false;
@@ -53,6 +54,8 @@ public class Game extends JPanel implements MouseListener, MouseMotionListener {
                 ball1.mouseClicked(e);
                 ball2.mouseClicked(e);
                 ball3.mouseClicked(e);
+                ball4.mouseClicked(e);
+
             }
 
             @Override
@@ -91,11 +94,14 @@ public class Game extends JPanel implements MouseListener, MouseMotionListener {
         g.setFont(new Font("Courier", Font.PLAIN, 15));
         Graphics2D g2d = (Graphics2D) g;
         if(!end) {
+            board.paintBackground(g2d);
             ball1.paint(g);
             g.setColor(Color.red);
             ball2.paint(g);
             g.setColor(Color.blue);
             ball3.paint(g);
+            g.setColor(Color.darkGray);
+            ball4.paint(g);
             g.setColor(Color.white);
             board.paintBoard(g2d);
             board.paintInfo(g2d);
@@ -104,11 +110,26 @@ public class Game extends JPanel implements MouseListener, MouseMotionListener {
             faces.paintAtlas(g2d);
             faces.paintCompass(g2d);
         } else {
+            g.setFont(new Font("Courier", Font.PLAIN, 40));
+            if(state.hyper=='x') {
+                g.setColor(new Color(12, 1, 5));
+            } else if(state.hyper=='o'){
+                g.setColor(new Color(5, 1, 12));
+            } else {
+                g.setColor(new Color(8, 8, 8));
+            }
+            for(int i=1;i<23;i++) {
+                g.drawString("XOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXO", 0, i*30);
+                i++;
+                g.drawString("OXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOX", 0, i*30);
+            }
             ball1.paint(g);
             g.setColor(Color.red);
             ball2.paint(g);
             g.setColor(Color.blue);
             ball3.paint(g);
+            g.setColor(Color.darkGray);
+            ball4.paint(g);
             if(state.hyper=='x'){
                 g2d.setColor(Color.red);
             } else if(state.hyper=='o'){
@@ -164,6 +185,7 @@ public class Game extends JPanel implements MouseListener, MouseMotionListener {
         ball1.updateComponent();
         ball2.updateComponent();
         ball3.updateComponent();
+        ball4.updateComponent();
         if(isWon()){
             if(!end){
                 state.endGamePolygons();

@@ -515,6 +515,8 @@ public class State {
         int offsetX;
         int offsetY;
         if(load<0) {
+            g.setColor(Color.black);
+            g.fillPolygon(polygons[8]);
             g.setColor(getColor(cubeAxis, cubeDepth,false));
             g.drawPolygon(polygons[8]);
             g.drawString(cubeName(cubeDepth, cubeAxis), 90, 385);

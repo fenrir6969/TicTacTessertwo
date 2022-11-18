@@ -622,6 +622,20 @@ public class Board {
         return state;
     }
 
+
+    public void paintBackground(Graphics2D g){
+        g.setFont(new Font("Courier", Font.PLAIN, 40));
+        if(playr=='x') {
+            g.setColor(new Color(12, 1, 5));
+        } else {
+            g.setColor(new Color(5, 1, 12));
+        }
+        for(int i=1;i<23;i++) {
+            g.drawString("XOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXO", 0, i*30);
+            i++;
+            g.drawString("OXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOX", 0, i*30);
+        }
+    }
     public void paintWin(Graphics2D g){
         int winX1=0;
         int winX2=0;
@@ -688,6 +702,8 @@ public class Board {
         g.setStroke(new BasicStroke(1));
     }
     public void paintBoard(Graphics2D g) {
+        g.setColor(Color.black);
+        g.fillRect(340, 50, 480, 480);
         if(load<maxLoad/2) {
             Color winState;
             if (isWon(state)) {
