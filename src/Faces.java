@@ -9,8 +9,9 @@ public class Faces {
     private Polygon next;
     private String nextName;
 
+    private int flashCount;
+    private int flashStart = 60;
     private int load;
-    private int maxLoad = 60;
 
     protected char A;
     protected char B;
@@ -139,15 +140,66 @@ public class Faces {
             g.drawString("Compass", 870, 605);
         }
         g.drawRect(870, 340, 240, 240);
-        g.setColor(Color.red);
-        Rectangle rect = new Rectangle(40,40);
-        //g.rotate(Math.toRadians(30));
-        for(NavButton button : buttons){
-            g.draw(button.rectangle);
+        Rectangle rect = new Rectangle(67,-25,50,50);
+        Rectangle rect1 = new Rectangle(83,-25,18,50);
+        Rectangle rect2 = new Rectangle(67,-9,50,18);
+        g.translate(990,460);
+        int angle = 22;
+        for (int i = 0; i < 4; i++) {
+            g.rotate(Math.toRadians(-angle));
+            g.setColor(Color.black);
+            g.fill(rect);
+            g.rotate(Math.toRadians(angle * 2));
+            g.setColor(Color.black);
+            g.fill(rect);
+            g.rotate(Math.toRadians(-angle));
+            g.rotate(Math.toRadians(90));
         }
+        if(load<=0) {
+            for (int i = 0; i < 4; i++) {
+                g.rotate(Math.toRadians(-angle));
+                g.setColor(Color.darkGray);
+                g.draw(rect1);
+                g.draw(rect2);
+                g.drawLine(40, 0, 67, 0);
+                g.rotate(Math.toRadians(angle * 2));
+                g.setColor(Color.darkGray);
+                g.draw(rect1);
+                g.draw(rect2);
+                g.drawLine(40, 0, 67, 0);
+                g.rotate(Math.toRadians(-angle));
+                g.rotate(Math.toRadians(90));
+            }
+            g.setColor(Color.white);
+            g.setFont(new Font("Courier", Font.PLAIN, 20));
+            g.drawString("BC+", 70, 40);
+            g.drawString("BD+", 70, -30);
+            g.drawString("BD-", -100, 40);
+            g.drawString("BC-", -100, -30);
+            g.drawString("AD-", 20, -80);
+            g.drawString("AC-", -50, -80);
+            g.drawString("AC+", 20, 95);
+            g.drawString("AD+", -50, 95);
+        }
+        for (int i = 0; i < 4; i++) {
+            g.rotate(Math.toRadians(-angle));
+            g.setColor(Color.white);
+            g.draw(rect);
+            g.drawLine(40, 0, 67, 0);
+            g.rotate(Math.toRadians(angle * 2));
+            g.setColor(Color.white);
+            g.draw(rect);
+            g.drawLine(40, 0, 67, 0);
+            g.rotate(Math.toRadians(-angle));
+            g.rotate(Math.toRadians(90));
+        }
+        g.setColor(Color.black);
+        g.fillRect(-40, -40, 80, 80);
+        g.setColor(Color.darkGray);
+        g.drawRect(-13, -40, 26, 80);
+        g.drawRect(-40, -13, 80, 26);
         g.setColor(Color.white);
-        //g.rotate(Math.toRadians(-30));
-
+        g.drawRect(-40, -40, 80, 80);
     }
     public void paintAtlas(Graphics2D g){
         g.drawString("Atlas        Viewing : " + toString(),870, 315);
@@ -155,7 +207,7 @@ public class Faces {
 
         g.setColor(Color.darkGray);
         g.fillPolygon(curr);
-        if ((next != null)&&(load>maxLoad/2)) {
+        if ((next != null)&&(flashCount > flashStart /2)) {
             g.fillPolygon(next);
         }
         g.setColor(Color.white);
@@ -170,7 +222,7 @@ public class Faces {
         g.drawPolygon(Polygons.polygons[1][2][0][1]);
         g.setColor(Color.yellow);
         g.drawPolygon(curr);
-        if ((next != null)&&(load>maxLoad/2)) {
+        if ((next != null)&&(flashCount > flashStart /2)) {
             g.drawPolygon(next);
         }
         g.setColor(Color.white);
@@ -194,10 +246,13 @@ public class Faces {
         return Polygons.polygons[address[0]][address[1]][address[2]][address[3]];
     }
     public void updateComponent() {
+        if(flashCount >0){
+            flashCount--;
+        } else {
+            flashCount = flashStart;
+        }
         if(load>0){
             load--;
-        } else {
-            load=maxLoad;
         }
     }
     public boolean mouseClicked(MouseEvent e) {
@@ -211,7 +266,8 @@ public class Faces {
                 face.set(rotate(button.axisDepth, button.clockwise));
                 next = face.rotate(button.axisDepth, button.clockwise).toPolygon();
                 nextName = face.rotate(button.axisDepth, button.clockwise).toString();
-                load=maxLoad/2;
+                flashCount = flashStart /2;
+                load=20;
                 System.out.println("[Faces] Rotating from " + this + " to " + face + "...");
                 set(face);
                 return true;
@@ -238,12 +294,12 @@ public class Faces {
     static NavButton[] buttons = {
         new NavButton(60 + xOffset, yOffset, AxisDepth.AC, false),
         new NavButton(120 + xOffset, yOffset, AxisDepth.AD, false),
-        new NavButton(60+xOffset,180+yOffset,AxisDepth.AC,true),
-        new NavButton(120 + xOffset, 180 + yOffset, AxisDepth.AD, true),
+        new NavButton(60+xOffset,180+yOffset,AxisDepth.AD,true),
+        new NavButton(120 + xOffset, 180 + yOffset, AxisDepth.AC, true),
         new NavButton(xOffset,60+yOffset,AxisDepth.BC,false),
         new NavButton(xOffset,120+yOffset,AxisDepth.BD,false),
-        new NavButton(180+xOffset,60+yOffset,AxisDepth.BC,true),
-        new NavButton(180+xOffset,120+yOffset,AxisDepth.BD,true)
+        new NavButton(180+xOffset,60+yOffset,AxisDepth.BD,true),
+        new NavButton(180+xOffset,120+yOffset,AxisDepth.BC,true)
     };
 
     static class NavButton {

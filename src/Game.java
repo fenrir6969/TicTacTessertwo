@@ -97,6 +97,7 @@ public class Game extends JPanel implements MouseListener, MouseMotionListener {
         Graphics2D g2d = (Graphics2D) g;
         if(!end) {
             board.paintBackground(g2d);
+            /*
             g.setColor(Color.red);
             ball2.paint(g);
             g.setColor(Color.blue);
@@ -105,6 +106,8 @@ public class Game extends JPanel implements MouseListener, MouseMotionListener {
             ball4.paint(g);
             g.setColor(Color.white);
             ball1.paint(g);
+
+             */
             board.paintBoard(g2d);
             board.paintInfo(g2d);
             state.paintHyper(g2d);
