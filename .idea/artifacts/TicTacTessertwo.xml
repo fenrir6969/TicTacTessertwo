@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact type="jlink" name="TicTacTessertwo">
+    <output-path>$PROJECT_DIR$/out/artifacts/TicTacTessertwo</output-path>
+    <root id="root">
+      <element id="archive" name="TicTacTessertwo.jar">
+        <element id="module-output" name="TicTacTessertwo" />
+      </element>
+    </root>
+  </artifact>
+</component>

@@ -42,8 +42,13 @@ public class Game extends JPanel implements MouseListener, MouseMotionListener {
                     }
                     state.mouseClicked(e);
                 } else {
-                    Rectangle boundsN = new Rectangle(772,548,20,20);
-                    Rectangle boundsY = new Rectangle(720,548,20,20);
+                    /*
+                    g2d.drawString("                            Y    ", 360,525);
+                    g2d.setColor(Color.blue);
+                    g2d.drawString("                                N", 360,525);
+                    */
+                    Rectangle boundsN = new Rectangle(772,505,20,20);
+                    Rectangle boundsY = new Rectangle(720,505,20,20);
                     if(boundsN.contains(e.getX(),e.getY())){
                         stop=true;
                     }
@@ -55,9 +60,7 @@ public class Game extends JPanel implements MouseListener, MouseMotionListener {
                 ball2.mouseClicked(e);
                 ball3.mouseClicked(e);
                 ball4.mouseClicked(e);
-
             }
-
             @Override
             public void mousePressed(MouseEvent e) {
 
@@ -79,7 +82,6 @@ public class Game extends JPanel implements MouseListener, MouseMotionListener {
                     faces.mouseMoved(e);
                 }
             }
-
             @Override
             public void mouseDragged(MouseEvent e) {
 
@@ -95,7 +97,6 @@ public class Game extends JPanel implements MouseListener, MouseMotionListener {
         Graphics2D g2d = (Graphics2D) g;
         if(!end) {
             board.paintBackground(g2d);
-            ball1.paint(g);
             g.setColor(Color.red);
             ball2.paint(g);
             g.setColor(Color.blue);
@@ -103,6 +104,7 @@ public class Game extends JPanel implements MouseListener, MouseMotionListener {
             g.setColor(Color.darkGray);
             ball4.paint(g);
             g.setColor(Color.white);
+            ball1.paint(g);
             board.paintBoard(g2d);
             board.paintInfo(g2d);
             state.paintHyper(g2d);
@@ -116,13 +118,14 @@ public class Game extends JPanel implements MouseListener, MouseMotionListener {
             } else if(state.hyper=='o'){
                 g.setColor(new Color(5, 1, 12));
             } else {
-                g.setColor(new Color(8, 8, 8));
+                g.setColor(new Color(6, 6, 6));
             }
             for(int i=1;i<23;i++) {
                 g.drawString("XOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXO", 0, i*30);
                 i++;
                 g.drawString("OXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOX", 0, i*30);
             }
+            g.setColor(Color.white);
             ball1.paint(g);
             g.setColor(Color.red);
             ball2.paint(g);
@@ -137,24 +140,29 @@ public class Game extends JPanel implements MouseListener, MouseMotionListener {
             } else {
                 g2d.setColor(Color.darkGray);
             }
-            g2d.setFont(new Font("Courier", Font.PLAIN, 80));
-            g2d.drawString("Game Over", 360,240);
+            g2d.setFont(new Font("Courier", Font.PLAIN, 81));
+            g2d.drawString("Game Over", 359,170);
             g2d.setFont(new Font("Courier", Font.PLAIN, 21));
             if(state.hyper!='s') {
-                g2d.drawString("                                " + Character.toUpperCase(state.hyper), 360, 270);
+                g2d.drawString("                                " + Character.toUpperCase(state.hyper), 360, 200);
                 g2d.setColor(Color.white);
-                g2d.drawString("Tic Tac Tesseract won by Player ", 360, 270);
+                g2d.drawString("Tic Tac Tesseract won by Player ", 360, 200);
             } else {
-                g2d.drawString("                         Stalemate", 360, 270);
+                g2d.drawString("                         Stalemate", 360, 200);
                 g2d.setColor(Color.white);
-                g2d.drawString("Tic Tac Tesseract end in ", 360, 270);
+                g2d.drawString("Tic Tac Tesseract end by ", 360, 200);
             }
-            state.paintEnd(g2d);
-            g2d.drawString("Play Again?                   /  ", 360,565);
+            state.paintEndScreen(g2d);
+            Rectangle boundsN = new Rectangle(772,505,20,20);
+            Rectangle boundsY = new Rectangle(720,505,20,20);
+            g2d.setFont(new Font("Courier", Font.PLAIN, 21));
+            g2d.drawString("Play Again?                   /  ", 360,525);
             g2d.setColor(Color.red);
-            g2d.drawString("                            Y    ", 360,565);
+            g2d.drawString("                            Y    ", 360,525);
+            //g2d.draw(boundsY);
             g2d.setColor(Color.blue);
-            g2d.drawString("                                N", 360,565);
+            g2d.drawString("                                N", 360,525);
+            //g2d.draw(boundsN);
         }
     }
     public boolean isWon() {
@@ -188,7 +196,6 @@ public class Game extends JPanel implements MouseListener, MouseMotionListener {
         ball4.updateComponent();
         if(isWon()){
             if(!end){
-                state.endGamePolygons();
                 end=true;
                 System.out.println();
                 System.out.println("Game Over");
@@ -198,7 +205,6 @@ public class Game extends JPanel implements MouseListener, MouseMotionListener {
     }
     private void restart() {
         System.out.println();
-
         System.out.println("Restarting Game...");
         state = new State();
         board = new Board();

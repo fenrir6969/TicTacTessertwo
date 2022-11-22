@@ -1,6 +1,5 @@
 import java.awt.*;
 import java.awt.event.MouseEvent;
-import java.util.Random;
 
 public class Board {
     protected char[][][][] hyper;
@@ -24,16 +23,18 @@ public class Board {
         me = new Faces ();
     }
 
-    private int evaluate(char ch) {
-        if(Character.isUpperCase(ch)){
-            return 2;
-        } else {
-            return 0;
+    private boolean isWon(char state) {
+        return (state == 'x')||(state=='o');
+    }
+    private boolean conflicting(char state1, char state2){
+        if(isWon(state1)&&isWon(state2)) {
+            if (state1 != state2) {
+                return true;
+            }
         }
+        return false;
     }
-    public boolean checkChars(char flat, char check) {
-        return (Character.toLowerCase(flat))==check;
-    }
+
     private int reverseAxis(char ch, int val) {
         int[] forwards = {0,1,2};
         int[] backwards = {2,1,0};
@@ -43,244 +44,18 @@ public class Board {
             return backwards[val];
         }
     }
-    public boolean isWon(char state) {
-        return (state == 'x')||(state=='o');
-    }
-    public boolean conflicting(char state1, char state2){
-        if(isWon(state1)&&isWon(state2)) {
-            if (state1 != state2) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public char[][] loadGeneric( Faces face){
         char[][] raw = new char[3][3];
-        int d = evaluate(face.D);
-        int c = evaluate(face.C);
-        if(checkChars(face.A,'x')){
-            if(checkChars(face.B,'y')){
-                //xyzw
-                if(checkChars(face.C,'z')){
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            raw[reverseAxis(face.A,a)][reverseAxis(face.B,b)] = hyper[a][b][c][d];
-                        }
-                    }
-                }
-                //xywz
-                else {
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            raw[reverseAxis(face.A,a)][reverseAxis(face.B,b)] = hyper[a][b][d][c];
-                        }
-                    }
-                }
-            }
-            else if(checkChars(face.B,'z')) {
-                //xzyw
-                if(checkChars(face.C,'y')){
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            raw[reverseAxis(face.A,a)][reverseAxis(face.B,b)] = hyper[a][c][b][d];
-                        }
-                    }
-                }
-                //xzwy
-                else {
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            raw[reverseAxis(face.A,a)][reverseAxis(face.B,b)] = hyper[a][d][b][c];
-                        }
-                    }
-                }
-            }
-            else {
-                //xwzy
-                if(checkChars(face.C,'z')){
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            raw[reverseAxis(face.A,a)][reverseAxis(face.B,b)] = hyper[a][d][c][b];
-                        }
-                    }
-                }
-                //xwyz
-                else {
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            raw[reverseAxis(face.A,a)][reverseAxis(face.B,b)] = hyper[a][c][d][b];
-                        }
-                    }
-                }
-            }
-        }
-        else if(checkChars(face.A,'y')){
-            if(checkChars(face.B,'x')){
-                //yxzw
-                if(checkChars(face.C,'z')){
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            raw[reverseAxis(face.A,a)][reverseAxis(face.B,b)] = hyper[b][a][c][d];
-                        }
-                    }
-                }
-                //yxwz
-                else {
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            raw[reverseAxis(face.A,a)][reverseAxis(face.B,b)] = hyper[b][a][d][c];
-                        }
-                    }
-                }
-            }
-            else if(checkChars(face.B,'z')){
-                //yzxw
-                if(checkChars(face.C,'x')){
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            raw[reverseAxis(face.A,a)][reverseAxis(face.B,b)] = hyper[c][a][b][d];
-                        }
-                    }
-                }
-                //yzwx
-                else {
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            raw[reverseAxis(face.A,a)][reverseAxis(face.B,b)] = hyper[d][a][b][c];
-                        }
-                    }
-                }
-            }
-            else {
-                //ywzx
-                if(checkChars(face.C,'z')){
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            raw[reverseAxis(face.A,a)][reverseAxis(face.B,b)] = hyper[d][a][c][b];
-                        }
-                    }
-                }
-                //ywxz
-                else {
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            raw[reverseAxis(face.A,a)][reverseAxis(face.B,b)] = hyper[c][a][d][b];
-                        }
-                    }
-                }
-            }
-        }
-        else if(checkChars(face.A,'z')){
-            if(checkChars(face.B,'x')){
-                //zxyw
-                if(checkChars(face.C,'y')){
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            raw[reverseAxis(face.A,a)][reverseAxis(face.B,b)] = hyper[b][c][a][d];
-                        }
-                    }
-                }
-                //zxwy
-                else {
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            raw[reverseAxis(face.A,a)][reverseAxis(face.B,b)] = hyper[b][d][a][c];
-                        }
-                    }
-                }
-            }
-            else if(checkChars(face.B,'y')){
-                //zyxw
-                if(checkChars(face.C,'x')){
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            raw[reverseAxis(face.A,a)][reverseAxis(face.B,b)] = hyper[c][b][a][d];
-                        }
-                    }
-                }
-                //zywx
-                else {
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            raw[reverseAxis(face.A,a)][reverseAxis(face.B,b)] = hyper[d][b][a][c];
-                        }
-                    }
-                }
-            }
-            else{
-                //zwxy
-                if(checkChars(face.C,'x')){
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            raw[reverseAxis(face.A,a)][reverseAxis(face.B,b)] = hyper[c][d][a][b];
-                        }
-                    }
-                }
-                //zwyx
-                else {
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            raw[reverseAxis(face.A,a)][reverseAxis(face.B,b)] = hyper[d][c][a][b];
-                        }
-                    }
-                }
-            }
-        }
-        else{
-            if(checkChars(face.B,'x')){
-                //wxzy
-                if(checkChars(face.C,'z')){
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            raw[reverseAxis(face.A,a)][reverseAxis(face.B,b)] = hyper[b][d][c][a];
-                        }
-                    }
-                }
-                //wxyz
-                else {
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            raw[reverseAxis(face.A,a)][reverseAxis(face.B,b)] = hyper[b][c][d][a];
-                        }
-                    }
-                }
-            }
-            else if(checkChars(face.B,'y')){
-                //wyzx
-                if(checkChars(face.C,'z')){
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            raw[reverseAxis(face.A,a)][reverseAxis(face.B,b)] = hyper[d][b][c][a];
-                        }
-                    }
-                }
-                //wyxz
-                else {
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            raw[reverseAxis(face.A,a)][reverseAxis(face.B,b)] = hyper[c][b][d][a];
-                        }
-                    }
-                }
-            }
-            else{
-                //wzxy
-                if(checkChars(face.C,'x')){
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            raw[reverseAxis(face.A,a)][reverseAxis(face.B,b)] = hyper[c][d][b][a];
-                        }
-                    }
-                }
-                //wzyx
-                else {
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            raw[reverseAxis(face.A,a)][reverseAxis(face.B,b)] = hyper[d][c][b][a];
-                        }
-                    }
-                }
+        int[] address = new int[4];
+        int d = face.value(face.D);
+        int c = face.value(face.C);
+        for(int b=0;b<3;b++) {
+            for(int a=0;a<3;a++) {
+                address[face.axisIndex(face.A)] = a;
+                address[face.axisIndex(face.B)] = b;
+                address[face.axisIndex(face.C)] = c;
+                address[face.axisIndex(face.D)] = d;
+                raw[reverseAxis(face.A,a)][reverseAxis(face.B,b)] = hyper[address[0]][address[1]][address[2]][address[3]];
             }
         }
         return raw;
@@ -295,9 +70,32 @@ public class Board {
             }
             System.out.println("");
         }
+        System.out.println("[Board] State " + state);
         me = face;
         load=maxLoad;
         check();
+    }
+    public void save() {
+        System.out.println("[Board] Saving " + me + "...");
+        for (int i = 0; i < 3; i++) {
+            System.out.print("[Board]   ");
+            for (int j = 0; j < 3; j++) {
+                System.out.print(" " + board[j][i]);
+            }
+            System.out.println("");
+        }
+        int[] address = new int[4];
+        int d = me.value(me.D);
+        int c = me.value(me.C);
+        for (int b = 0; b < 3; b++) {
+            for (int a = 0; a < 3; a++) {
+                address[me.axisIndex(me.A)] = a;
+                address[me.axisIndex(me.B)] = b;
+                address[me.axisIndex(me.C)] = c;
+                address[me.axisIndex(me.D)] = d;
+                hyper[address[0]][address[1]][address[2]][address[3]] = board[reverseAxis(me.A, a)][reverseAxis(me.B, b)];
+            }
+        }
     }
     public char checkGeneric( char[][] raw) {
         char win='-';
@@ -350,7 +148,7 @@ public class Board {
         }
         return win;
     }
-    public void check() {
+    private void check() {
         System.out.println("[Board] Checking " + me + "...");
         if(!isWon(state)){
             state = checkGeneric(board);
@@ -358,7 +156,7 @@ public class Board {
             System.out.println("[Board] Board already won by " + state);
         }
     }
-    public boolean checkStalemate( char[][] raw) {
+    private boolean checkStalemate( char[][] raw) {
         //Diagonal 1
         if(!(conflicting(raw[0][0],raw[1][1])||conflicting(raw[2][2],raw[1][1])||conflicting(raw[0][0],raw[2][2]))){
             return false;
@@ -379,242 +177,7 @@ public class Board {
         }
         return true;
     }
-    public void save(){
-        System.out.println("[Board] Saving " + me + "...");
-        for(int i=0;i<3;i++){
-            System.out.print("[Board]   ");
-            for(int j=0;j<3;j++){
-                System.out.print(" " + board[j][i]);
-            }
-            System.out.println("");
-        }
-        int d = evaluate(me.D);
-        int c = evaluate(me.C);
-        if(checkChars(me.A,'x')){
-            if(checkChars(me.B,'y')){
-                //xyzw
-                if(checkChars(me.C,'z')){
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            hyper[a][b][c][d] = board[reverseAxis(me.A,a)][reverseAxis(me.B,b)];
-                        }
-                    }
-                }
-                //xywz
-                else {
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            hyper[a][b][d][c] = board[reverseAxis(me.A,a)][reverseAxis(me.B,b)];
-                        }
-                    }
-                }
-            }
-            else if(checkChars(me.B,'z')) {
-                //xzyw
-                if(checkChars(me.C,'y')){
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            hyper[a][c][b][d] = board[reverseAxis(me.A,a)][reverseAxis(me.B,b)];
-                        }
-                    }
-                }
-                //xzwy
-                else {
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            hyper[a][d][b][c] = board[reverseAxis(me.A,a)][reverseAxis(me.B,b)];
-                        }
-                    }
-                }
-            }
-            else {
-                //xwzy
-                if(checkChars(me.C,'z')){
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            hyper[a][d][c][b] = board[reverseAxis(me.A,a)][reverseAxis(me.B,b)];
-                        }
-                    }
-                }
-                //xwyz
-                else {
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            hyper[a][c][d][b] = board[reverseAxis(me.A,a)][reverseAxis(me.B,b)];
-                        }
-                    }
-                }
-            }
-        }
-        else if(checkChars(me.A,'y')){
-            if(checkChars(me.B,'x')){
-                //yxzw
-                if(checkChars(me.C,'z')){
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            hyper[b][a][c][d] = board[reverseAxis(me.A,a)][reverseAxis(me.B,b)];
-                        }
-                    }
-                }
-                //yxwz
-                else {
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            hyper[b][a][d][c] = board[reverseAxis(me.A,a)][reverseAxis(me.B,b)];
-                        }
-                    }
-                }
-            }
-            else if(checkChars(me.B,'z')){
-                //yzxw
-                if(checkChars(me.C,'x')){
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            hyper[c][a][b][d] = board[reverseAxis(me.A,a)][reverseAxis(me.B,b)];
-                        }
-                    }
-                }
-                //yzwx
-                else {
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            hyper[d][a][b][c] = board[reverseAxis(me.A,a)][reverseAxis(me.B,b)];
-                        }
-                    }
-                }
-            }
-            else {
-                //ywzx
-                if(checkChars(me.C,'z')){
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            hyper[d][a][c][b] = board[reverseAxis(me.A,a)][reverseAxis(me.B,b)];
-                        }
-                    }
-                }
-                //ywxz
-                else {
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            hyper[c][a][d][b] = board[reverseAxis(me.A,a)][reverseAxis(me.B,b)];
-                        }
-                    }
-                }
-            }
-        }
-        else if(checkChars(me.A,'z')){
-            if(checkChars(me.B,'x')){
-                //zxyw
-                if(checkChars(me.C,'y')){
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            hyper[b][c][a][d] = board[reverseAxis(me.A,a)][reverseAxis(me.B,b)];
-                        }
-                    }
-                }
-                //zxwy
-                else {
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            hyper[b][d][a][c] = board[reverseAxis(me.A,a)][reverseAxis(me.B,b)];
-                        }
-                    }
-                }
-            }
-            else if(checkChars(me.B,'y')){
-                //zyxw
-                if(checkChars(me.C,'x')){
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            hyper[c][b][a][d] = board[reverseAxis(me.A,a)][reverseAxis(me.B,b)];
-                        }
-                    }
-                }
-                //zywx
-                else {
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            hyper[d][b][a][c] = board[reverseAxis(me.A,a)][reverseAxis(me.B,b)];
-                        }
-                    }
-                }
-            }
-            else{
-                //zwxy
-                if(checkChars(me.C,'x')){
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            hyper[c][d][a][b] = board[reverseAxis(me.A,a)][reverseAxis(me.B,b)];
-                        }
-                    }
-                }
-                //zwyx
-                else {
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            hyper[d][c][a][b] = board[reverseAxis(me.A,a)][reverseAxis(me.B,b)];
-                        }
-                    }
-                }
-            }
-        }
-        else{
-            if(checkChars(me.B,'x')){
-                //wxzy
-                if(checkChars(me.C,'z')){
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            hyper[b][d][c][a] = board[reverseAxis(me.A,a)][reverseAxis(me.B,b)];
-                        }
-                    }
-                }
-                //wxyz
-                else {
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            hyper[b][c][d][a] = board[reverseAxis(me.A,a)][reverseAxis(me.B,b)];
-                        }
-                    }
-                }
-            }
-            else if(checkChars(me.B,'y')){
-                //wyzx
-                if(checkChars(me.C,'z')){
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            hyper[d][b][c][a] = board[reverseAxis(me.A,a)][reverseAxis(me.B,b)];
-                        }
-                    }
-                }
-                //wyxz
-                else {
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            hyper[c][b][d][a] = board[reverseAxis(me.A,a)][reverseAxis(me.B,b)];
-                        }
-                    }
-                }
-            }
-            else{
-                //wzxy
-                if(checkChars(me.C,'x')){
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            hyper[c][d][b][a] = board[reverseAxis(me.A,a)][reverseAxis(me.B,b)];
-                        }
-                    }
-                }
-                //wzyx
-                else {
-                    for(int b=0;b<3;b++) {
-                        for(int a=0;a<3;a++) {
-                            hyper[d][c][b][a] = board[reverseAxis(me.A,a)][reverseAxis(me.B,b)];
-                        }
-                    }
-                }
-            }
-        }
-    }
+
     public void setState( char ch) {
         state = ch;
     }
@@ -622,13 +185,12 @@ public class Board {
         return state;
     }
 
-
     public void paintBackground(Graphics2D g){
         g.setFont(new Font("Courier", Font.PLAIN, 40));
         if(playr=='x') {
-            g.setColor(new Color(12, 1, 5));
+            g.setColor(new Color(15, 0, 5));
         } else {
-            g.setColor(new Color(5, 1, 12));
+            g.setColor(new Color(5, 0, 15));
         }
         for(int i=1;i<23;i++) {
             g.drawString("XOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXOXO", 0, i*30);

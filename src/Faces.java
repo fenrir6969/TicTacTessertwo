@@ -1,6 +1,5 @@
 import java.awt.*;
 import java.awt.event.MouseEvent;
-import java.util.Random;
 
 public class Faces {
     private static final char X = 'x';
@@ -42,17 +41,14 @@ public class Faces {
             return Character.toUpperCase(ch);
         }
     }
-    public char flatten(char ch) {
-        return Character.toLowerCase(ch);
-    }
-    public int evaluate(char ch) {
+
+    public int value(char ch){
         if(Character.isUpperCase(ch)){
             return 2;
         } else {
             return 0;
         }
     }
-
     public void define(char axisA,char axisB,char depthC,char depthD) {
         A = axisA;
         B = axisB;
@@ -68,7 +64,6 @@ public class Faces {
         D = face.D;
         curr = toPolygon();
     }
-
 
     enum AxisDepth { AC, AD, BC, BD }
     Faces rotate(AxisDepth axisDepth, boolean clockwise) {
@@ -145,12 +140,13 @@ public class Faces {
         }
         g.drawRect(870, 340, 240, 240);
         g.setColor(Color.red);
+        Rectangle rect = new Rectangle(40,40);
+        //g.rotate(Math.toRadians(30));
         for(NavButton button : buttons){
             g.draw(button.rectangle);
         }
         g.setColor(Color.white);
-
-
+        //g.rotate(Math.toRadians(-30));
 
     }
     public void paintAtlas(Graphics2D g){
@@ -160,276 +156,42 @@ public class Faces {
         g.setColor(Color.darkGray);
         g.fillPolygon(curr);
         if ((next != null)&&(load>maxLoad/2)) {
-            //g.setColor(new Color(1,50,32));
             g.fillPolygon(next);
         }
         g.setColor(Color.white);
         // magic numbers
-        g.drawPolygon(Polygons.polygons[2]);
-        g.drawPolygon(Polygons.polygons[4]);
-        g.drawPolygon(Polygons.polygons[7]);
-        g.drawPolygon(Polygons.polygons[9]);
-        g.drawPolygon(Polygons.polygons[12]);
-        g.drawPolygon(Polygons.polygons[14]);
-        g.drawPolygon(Polygons.polygons[16]);
-        g.drawPolygon(Polygons.polygons[18]);
+        g.drawPolygon(Polygons.polygons[1][0][2][1]);
+        g.drawPolygon(Polygons.polygons[1][0][0][1]);
+        g.drawPolygon(Polygons.polygons[2][1][1][0]);
+        g.drawPolygon(Polygons.polygons[0][1][1][0]);
+        g.drawPolygon(Polygons.polygons[2][1][1][2]);
+        g.drawPolygon(Polygons.polygons[0][1][1][2]);
+        g.drawPolygon(Polygons.polygons[1][2][2][1]);
+        g.drawPolygon(Polygons.polygons[1][2][0][1]);
         g.setColor(Color.yellow);
         g.drawPolygon(curr);
         if ((next != null)&&(load>maxLoad/2)) {
-            //g.setColor(Color.green);
             g.drawPolygon(next);
         }
         g.setColor(Color.white);
     }
+
+    public int axisIndex(char axis) {
+        return switch (axis) {
+            case 'x', 'X' -> 0;
+            case 'y', 'Y' -> 1;
+            case 'z', 'Z' -> 2;
+            case 'w', 'W' -> 3;
+            default -> throw new IllegalArgumentException("Impossible!");
+        };
+    }
     private Polygon toPolygon(){
-        if(flatten(C)==X){
-            if(flatten(D)==Y){
-                //xy
-                if(evaluate(C)==2){
-                    if(evaluate(D)==2){
-                        //x2y2
-                        return Polygons.polygons[17];
-                    } else {
-                        //x2y0
-                        return Polygons.polygons[3];
-                    }
-                } else {
-                    if(evaluate(D)==2){
-                        //x0y2
-                        return Polygons.polygons[19];
-                    } else {
-                        //x0y0
-                        return Polygons.polygons[5];
-                    }
-                }
-            }
-            else if(flatten(D)=='z') {
-                //xz
-                if(evaluate(C)==2){
-                    if(evaluate(D)==2){
-                        //x2z2
-                        return Polygons.polygons[22];
-                    } else {
-                        //x2z0
-                        return Polygons.polygons[23];
-                    }
-                } else {
-                    if(evaluate(D)==2){
-                        //x0z2
-                        return Polygons.polygons[21];
-                    } else {
-                        //x0z0
-                        return Polygons.polygons[24];
-                    }
-                }
-            }
-            else {
-                //xw
-                if(evaluate(C)==2){
-                    if(evaluate(D)==2){
-                        //x2w2
-                        return Polygons.polygons[12];
-                    } else {
-                        //x2w0
-                        return Polygons.polygons[7];
-                    }
-                } else {
-                    if(evaluate(D)==2){
-                        //x0w2
-                        return Polygons.polygons[14];
-                    } else {
-                        //x0w0
-                        return Polygons.polygons[9];
-                    }
-                }
-            }
-        }
-        else if(flatten(C)==Y){
-            if(flatten(D)==X){
-                //yx
-                if(evaluate(C)==2){
-                    if(evaluate(D)==2){
-                        //y2x2
-                        return Polygons.polygons[17];
-                    } else {
-                        //y2x0
-                        return Polygons.polygons[19];
-                    }
-                } else {
-                    if(evaluate(D)==2){
-                        //y0x2
-                        return Polygons.polygons[3];
-                    } else {
-                        //y0x0
-                        return Polygons.polygons[5];
-                    }
-                }
-            }
-            else if(flatten(D)=='z'){
-                //yz
-                if(evaluate(C)==2){
-                    if(evaluate(D)==2){
-                        //y2z2
-                        return Polygons.polygons[16];
-                    } else {
-                        //y2z0
-                        return Polygons.polygons[18];
-                    }
-                } else {
-                    if(evaluate(D)==2){
-                        //y0z2
-                        return Polygons.polygons[2];
-                    } else {
-                        //y0z0
-                        return Polygons.polygons[4];
-                    }
-                }
-            }
-            else {
-                //yw
-                if(evaluate(C)==2){
-                    if(evaluate(D)==2){
-                        //y2w2
-                        return Polygons.polygons[15];
-                    } else {
-                        //y2w0
-                        return Polygons.polygons[20];
-                    }
-                } else {
-                    if(evaluate(D)==2){
-                        //y0w2
-                        return Polygons.polygons[10];
-                    } else {
-                        //y0w0
-                        return Polygons.polygons[1];
-                    }
-                }
-            }
-        }
-        else if(flatten(C)=='z'){
-            if(flatten(D)==X){
-                //zx
-                if(evaluate(C)==2){
-                    if(evaluate(D)==2){
-                        //z2x2
-                        return Polygons.polygons[22];
-                    } else {
-                        //z2x0
-                        return Polygons.polygons[21];
-                    }
-                } else {
-                    if(evaluate(D)==2){
-                        //z0x2
-                        return Polygons.polygons[23];
-                    } else {
-                        //z0x0
-                        return Polygons.polygons[24];
-                    }
-                }
-            }
-            else if(flatten(D)==Y){
-                //zy
-                if(evaluate(C)==2){
-                    if(evaluate(D)==2){
-                        //z2y2
-                        return Polygons.polygons[16];
-                    } else {
-                        //z2y0
-                        return Polygons.polygons[2];
-                    }
-                } else {
-                    if(evaluate(D)==2){
-                        //z0y2
-                        return Polygons.polygons[18];
-                    } else {
-                        //z0y0
-                        return Polygons.polygons[4];
-                    }
-                }
-            }
-            else{
-                //zw
-                if(evaluate(C)==2){
-                    if(evaluate(D)==2){
-                        //z2w2
-                        return Polygons.polygons[11];
-                    } else {
-                        //z2w0
-                        return Polygons.polygons[6];
-                    }
-                } else {
-                    if(evaluate(D)==2){
-                        //z0w2
-                        return Polygons.polygons[13];
-                    } else {
-                        //z0w0
-                        return Polygons.polygons[8];
-                    }
-                }
-            }
-        }
-        else{
-            if(flatten(D)==X){
-                //wx
-                if(evaluate(C)==2){
-                    if(evaluate(D)==2){
-                        //w2x2
-                        return Polygons.polygons[12];
-                    } else {
-                        //w2x0
-                        return Polygons.polygons[14];
-                    }
-                } else {
-                    if(evaluate(D)==2){
-                        //w0x2
-                        return Polygons.polygons[7];
-                    } else {
-                        //w0x0
-                        return Polygons.polygons[9];
-                    }
-                }
-            }
-            else if(flatten(D)==Y){
-                //wy
-                if(evaluate(C)==2){
-                    if(evaluate(D)==2){
-                        //w2y2
-                        return Polygons.polygons[15];
-                    } else {
-                        //w2y0
-                        return Polygons.polygons[10];
-                    }
-                } else {
-                    if(evaluate(D)==2){
-                        //w0y2
-                        return Polygons.polygons[20];
-                    } else {
-                        //w0y0
-                        return Polygons.polygons[1];
-                    }
-                }
-            }
-            else{
-                //wz
-                if(evaluate(C)==2){
-                    if(evaluate(D)==2){
-                        //w2z2
-                        return Polygons.polygons[11];
-                    } else {
-                        //w2z0
-                        return Polygons.polygons[13];
-                    }
-                } else {
-                    if(evaluate(D)==2){
-                        //w0z2
-                        return Polygons.polygons[6];
-                    } else {
-                        //w0z0
-                        return Polygons.polygons[8];
-                    }
-                }
-            }
-        }
+        int[] address = new int[4];
+        address[axisIndex(A)] = 1;
+        address[axisIndex(B)] = 1;
+        address[axisIndex(C)] = value(C);
+        address[axisIndex(D)] = value(D);
+        return Polygons.polygons[address[0]][address[1]][address[2]][address[3]];
     }
     public void updateComponent() {
         if(load>0){
@@ -460,7 +222,6 @@ public class Faces {
     public void mouseMoved(MouseEvent e) {
         int mosX = e.getX();
         int mosY = e.getY();
-
         for (NavButton button : buttons) {
             if (button.rectangle.contains(mosX, mosY)) {
                 next = rotate(button.axisDepth, button.clockwise).toPolygon();
@@ -470,7 +231,6 @@ public class Faces {
         }
         next = null;
         nextName = null;
-
     }
 
     final static int xOffset = 870;
@@ -503,7 +263,7 @@ public class Faces {
         //                                   0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16
         private static final int[] pointsX = {0, 57, 208, 25, 177, 97, 151, 85, 140, 98, 154, 86, 141, 61, 213, 30, 180};
         private static final int[] pointsY = {0, 23, 25, 75, 77, 83, 85, 102, 104, 135, 137, 155, 157, 164, 170, 215, 220};
-        public static final Polygon[] polygons = new Polygon[26];
+        public static final Polygon[][][][] polygons = new Polygon[3][3][3][3];
 
         static {
             initializePolygons();
@@ -522,31 +282,31 @@ public class Faces {
                 pointsX[i] = pointsX[i] + offsetX;
                 pointsY[i] = pointsY[i] + offsetY;
             }
-            polygons[1] = makePolygon(1, 2, 4, 3);
-            polygons[2] = makePolygon(1, 2, 6, 5);
-            polygons[3] = makePolygon(2, 4, 8, 6);
-            polygons[4] = makePolygon(4, 3, 7, 8);
-            polygons[5] = makePolygon(3, 1, 5, 7);
-            polygons[6] = makePolygon(1, 2, 14, 13);
-            polygons[7] = makePolygon(2, 4, 16, 14);
-            polygons[8] = makePolygon(4, 3, 15, 16);
-            polygons[9] = makePolygon(3, 1, 13, 15);
-            polygons[10] = makePolygon(5, 6, 8, 7);
-            polygons[11] = makePolygon(5, 6, 10, 9);
-            polygons[12] = makePolygon(6, 8, 12, 10);
-            polygons[13] = makePolygon(8, 7, 11, 12);
-            polygons[14] = makePolygon(7, 5, 9, 11);
-            polygons[15] = makePolygon(9, 10, 12, 11);
-            polygons[16] = makePolygon(9, 10, 14, 13);
-            polygons[17] = makePolygon(10, 12, 16, 14);
-            polygons[18] = makePolygon(12, 11, 15, 16);
-            polygons[19] = makePolygon(11, 9, 13, 15);
-            polygons[20] = makePolygon(13, 14, 16, 15);
-            polygons[21] = makePolygon(1, 5, 9, 13);
-            polygons[22] = makePolygon(2, 6, 10, 14);
-            polygons[23] = makePolygon(4, 8, 12, 16);
-            polygons[24] = makePolygon(3, 7, 11, 15);
+            //       x  y  z  w
+            polygons[1][0][1][0]=makePolygon( 1, 2, 4, 3);
+            polygons[1][0][2][1]=makePolygon( 1, 2, 6, 5);
+            polygons[2][0][1][1]=makePolygon( 2, 4, 8, 6);
+            polygons[1][0][0][1]=makePolygon( 4, 3, 7, 8);
+            polygons[0][0][1][1]=makePolygon( 3, 1, 5, 7);
+            polygons[1][1][2][0]=makePolygon( 1, 2,14,13);
+            polygons[2][1][1][0]=makePolygon( 2, 4,16,14);
+            polygons[1][1][0][0]=makePolygon( 4, 3,15,16);
+            polygons[0][1][1][0]=makePolygon( 3, 1,13,15);
+            polygons[1][0][1][2]=makePolygon( 5, 6, 8, 7);
+            polygons[1][1][2][2]=makePolygon( 5, 6,10, 9);
+            polygons[2][1][1][2]=makePolygon( 6, 8,12,10);
+            polygons[1][1][0][2]=makePolygon( 8, 7,11,12);
+            polygons[0][1][1][2]=makePolygon( 7, 5, 9,11);
+            polygons[1][2][1][2]=makePolygon( 9,10,12,11);
+            polygons[1][2][2][1]=makePolygon( 9,10,14,13);
+            polygons[2][2][1][1]=makePolygon(10,12,16,14);
+            polygons[1][2][0][1]=makePolygon(12,11,15,16);
+            polygons[0][2][1][1]=makePolygon(11, 9,13,15);
+            polygons[1][2][1][0]=makePolygon(13,14,16,15);
+            polygons[0][1][2][1]=makePolygon( 1, 5, 9,13);
+            polygons[2][1][2][1]=makePolygon( 2, 6,10,14);
+            polygons[2][1][0][1]=makePolygon( 4, 8,12,16);
+            polygons[0][1][0][1]=makePolygon( 3, 7,11,15);
         }
     }
-
 }
