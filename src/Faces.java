@@ -2,21 +2,19 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 
 public class Faces {
-    private static final char X = 'x';
-    private static final char Y = 'y';
-
-    private Polygon curr;
-    private Polygon next;
-    private String nextName;
-
-    private int flashCount;
-    private int flashStart = 60;
-    private int load;
+    final static int xOffset = 870;
+    final static int yOffset = 340;
 
     protected char A;
     protected char B;
     protected char C;
     protected char D;
+    private Polygon curr;
+    private Polygon next;
+    private String nextName;
+    private int flashCount;
+    private final int flashStart = 60;
+    private int load;
 
     public Faces() {
         A = ' ';
@@ -24,7 +22,8 @@ public class Faces {
         C = ' ';
         D = ' ';
     }
-    public Faces(char axisA,char axisB,char depthC,char depthD){
+
+    public Faces(char axisA, char axisB, char depthC, char depthD) {
         A = axisA;
         B = axisB;
         C = depthC;
@@ -35,6 +34,7 @@ public class Faces {
     public String toString() {
         return "" + A + B + C + D;
     }
+
     private char flipCase(char ch) {
         if (Character.isUpperCase(ch)) {
             return Character.toLowerCase(ch);
@@ -43,14 +43,15 @@ public class Faces {
         }
     }
 
-    public int value(char ch){
-        if(Character.isUpperCase(ch)){
+    public int value(char ch) {
+        if (Character.isUpperCase(ch)) {
             return 2;
         } else {
             return 0;
         }
     }
-    public void define(char axisA,char axisB,char depthC,char depthD) {
+
+    public void define(char axisA, char axisB, char depthC, char depthD) {
         A = axisA;
         B = axisB;
         C = depthC;
@@ -58,7 +59,8 @@ public class Faces {
         System.out.println("[Faces] Defined Face " + this);
         curr = toPolygon();
     }
-    public void set(Faces face){
+
+    public void set(Faces face) {
         A = face.A;
         B = face.B;
         C = face.C;
@@ -66,84 +68,87 @@ public class Faces {
         curr = toPolygon();
     }
 
-    enum AxisDepth { AC, AD, BC, BD }
     Faces rotate(AxisDepth axisDepth, boolean clockwise) {
-        switch(axisDepth) {
-            case AC: return rotateAC(clockwise);
-            case AD: return rotateAD(clockwise);
-            case BC: return rotateBC(clockwise);
-            case BD: return rotateBD(clockwise);
+        switch (axisDepth) {
+            case AC:
+                return rotateAC(clockwise);
+            case AD:
+                return rotateAD(clockwise);
+            case BC:
+                return rotateBC(clockwise);
+            case BD:
+                return rotateBD(clockwise);
         }
         throw new IllegalArgumentException("Impossible!");
     }
-    public Faces rotateAC( boolean clockwise) {
+
+    public Faces rotateAC(boolean clockwise) {
         Faces Next = new Faces();
         Next.A = A;
         Next.D = D;
-        if( clockwise ) {
+        if (clockwise) {
             Next.B = flipCase(C);
             Next.C = B;
-        }
-        else {
+        } else {
             Next.C = flipCase(B);
             Next.B = C;
         }
         return Next;
     }
-    public Faces rotateAD( boolean clockwise) {
+
+    public Faces rotateAD(boolean clockwise) {
         Faces Next = new Faces();
         Next.A = A;
         Next.C = C;
-        if( clockwise ) {
+        if (clockwise) {
             Next.B = flipCase(D);
             Next.D = B;
-        }
-        else {
+        } else {
             Next.D = flipCase(B);
             Next.B = D;
         }
         return Next;
     }
-    public Faces rotateBC( boolean clockwise) {
+
+    public Faces rotateBC(boolean clockwise) {
         Faces Next = new Faces();
         Next.B = B;
         Next.D = D;
-        if( clockwise ) {
+        if (clockwise) {
             Next.A = flipCase(C);
             Next.C = A;
-        }
-        else {
+        } else {
             Next.C = flipCase(A);
             Next.A = C;
         }
         return Next;
     }
-    public Faces rotateBD( boolean clockwise) {
+
+    public Faces rotateBD(boolean clockwise) {
         Faces Next = new Faces();
         Next.B = B;
         Next.C = C;
-        if( clockwise ) {
+        if (clockwise) {
             Next.A = flipCase(D);
             Next.D = A;
-        }
-        else {
+        } else {
             Next.D = flipCase(A);
             Next.A = D;
         }
         return Next;
     }
 
-    public void paintCompass(Graphics2D g){
-        if(nextName!=null){
+    public void paintCompass(Graphics2D g) {
+        if (nextName != null) {
             g.drawString("Compass   Previewing : " + nextName, 870, 605);
         } else {
             g.drawString("Compass", 870, 605);
         }
         g.drawRect(870, 340, 240, 240);
-        Rectangle rect = new Rectangle(67,-25,50,50);
-        Rectangle rect1 = new Rectangle(83,-25,18,50);
-        Rectangle rect2 = new Rectangle(67,-9,50,18);
-        g.translate(990,460);
+        Rectangle rect = new Rectangle(67, -25, 50, 50);
+        Rectangle rect1 = new Rectangle(83, -25, 18, 50);
+        Rectangle rect2 = new Rectangle(67, -9, 50, 18);
+        g.translate(990, 460);
         int angle = 22;
         for (int i = 0; i < 4; i++) {
             g.rotate(Math.toRadians(-angle));
@@ -155,7 +160,7 @@ public class Faces {
             g.rotate(Math.toRadians(-angle));
             g.rotate(Math.toRadians(90));
         }
-        if(load<=0) {
+        if (load <= 0) {
             for (int i = 0; i < 4; i++) {
                 g.rotate(Math.toRadians(-angle));
                 g.setColor(Color.darkGray);
@@ -201,13 +206,14 @@ public class Faces {
         g.setColor(Color.white);
         g.drawRect(-40, -40, 80, 80);
     }
-    public void paintAtlas(Graphics2D g){
-        g.drawString("Atlas        Viewing : " + toString(),870, 315);
+
+    public void paintAtlas(Graphics2D g) {
+        g.drawString("Atlas        Viewing : " + this, 870, 315);
         g.drawRect(870, 50, 240, 240);
 
         g.setColor(Color.darkGray);
         g.fillPolygon(curr);
-        if ((next != null)&&(flashCount > flashStart /2)) {
+        if ((next != null) && (flashCount > flashStart / 2)) {
             g.fillPolygon(next);
         }
         g.setColor(Color.white);
@@ -222,7 +228,7 @@ public class Faces {
         g.drawPolygon(Polygons.polygons[1][2][0][1]);
         g.setColor(Color.yellow);
         g.drawPolygon(curr);
-        if ((next != null)&&(flashCount > flashStart /2)) {
+        if ((next != null) && (flashCount > flashStart / 2)) {
             g.drawPolygon(next);
         }
         g.setColor(Color.white);
@@ -237,7 +243,8 @@ public class Faces {
             default -> throw new IllegalArgumentException("Impossible!");
         };
     }
-    private Polygon toPolygon(){
+
+    private Polygon toPolygon() {
         int[] address = new int[4];
         address[axisIndex(A)] = 1;
         address[axisIndex(B)] = 1;
@@ -245,29 +252,31 @@ public class Faces {
         address[axisIndex(D)] = value(D);
         return Polygons.polygons[address[0]][address[1]][address[2]][address[3]];
     }
+
     public void updateComponent() {
-        if(flashCount >0){
+        if (flashCount > 0) {
             flashCount--;
         } else {
             flashCount = flashStart;
         }
-        if(load>0){
+        if (load > 0) {
             load--;
         }
     }
+
     public boolean mouseClicked(MouseEvent e) {
         int mosX = e.getX();
         int mosY = e.getY();
-            Faces face = new Faces();
-        for (NavButton button : buttons) {
+        Faces face = new Faces();
+        for (NavButton button : NavButton.buttons) {
             if (button.rectangle.contains(mosX, mosY)) {
                 System.out.println();
                 System.out.println("Rotating...");
                 face.set(rotate(button.axisDepth, button.clockwise));
                 next = face.rotate(button.axisDepth, button.clockwise).toPolygon();
                 nextName = face.rotate(button.axisDepth, button.clockwise).toString();
-                flashCount = flashStart /2;
-                load=20;
+                flashCount = flashStart / 2;
+                load = 20;
                 System.out.println("[Faces] Rotating from " + this + " to " + face + "...");
                 set(face);
                 return true;
@@ -275,10 +284,11 @@ public class Faces {
         }
         return false;
     }
+
     public void mouseMoved(MouseEvent e) {
         int mosX = e.getX();
         int mosY = e.getY();
-        for (NavButton button : buttons) {
+        for (NavButton button : NavButton.buttons) {
             if (button.rectangle.contains(mosX, mosY)) {
                 next = rotate(button.axisDepth, button.clockwise).toPolygon();
                 nextName = rotate(button.axisDepth, button.clockwise).toString();
@@ -288,24 +298,22 @@ public class Faces {
         next = null;
         nextName = null;
     }
-
-    final static int xOffset = 870;
-    final static int yOffset = 340;
-    static NavButton[] buttons = {
-        new NavButton(60 + xOffset, yOffset, AxisDepth.AC, false),
-        new NavButton(120 + xOffset, yOffset, AxisDepth.AD, false),
-        new NavButton(60+xOffset,180+yOffset,AxisDepth.AD,true),
-        new NavButton(120 + xOffset, 180 + yOffset, AxisDepth.AC, true),
-        new NavButton(xOffset,60+yOffset,AxisDepth.BC,false),
-        new NavButton(xOffset,120+yOffset,AxisDepth.BD,false),
-        new NavButton(180+xOffset,60+yOffset,AxisDepth.BD,true),
-        new NavButton(180+xOffset,120+yOffset,AxisDepth.BC,true)
-    };
+    enum AxisDepth {AC, AD, BC, BD}
 
     static class NavButton {
         Rectangle rectangle;
         Faces.AxisDepth axisDepth;
         boolean clockwise;
+        static NavButton[] buttons = {
+                new NavButton(60 + xOffset, yOffset, AxisDepth.AC, false),
+                new NavButton(120 + xOffset, yOffset, AxisDepth.AD, false),
+                new NavButton(60 + xOffset, 180 + yOffset, AxisDepth.AD, true),
+                new NavButton(120 + xOffset, 180 + yOffset, AxisDepth.AC, true),
+                new NavButton(xOffset, 60 + yOffset, AxisDepth.BC, false),
+                new NavButton(xOffset, 120 + yOffset, AxisDepth.BD, false),
+                new NavButton(180 + xOffset, 60 + yOffset, AxisDepth.BD, true),
+                new NavButton(180 + xOffset, 120 + yOffset, AxisDepth.BC, true)
+        };
 
         NavButton(int x, int y, Faces.AxisDepth axisDepth, boolean clockwise) {
             this.rectangle = new Rectangle(x, y, 60, 60);
@@ -316,10 +324,10 @@ public class Faces {
 
     static class Polygons {
 
+        public static final Polygon[][][][] polygons = new Polygon[3][3][3][3];
         //                                   0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16
         private static final int[] pointsX = {0, 57, 208, 25, 177, 97, 151, 85, 140, 98, 154, 86, 141, 61, 213, 30, 180};
         private static final int[] pointsY = {0, 23, 25, 75, 77, 83, 85, 102, 104, 135, 137, 155, 157, 164, 170, 215, 220};
-        public static final Polygon[][][][] polygons = new Polygon[3][3][3][3];
 
         static {
             initializePolygons();
@@ -339,30 +347,30 @@ public class Faces {
                 pointsY[i] = pointsY[i] + offsetY;
             }
             //       x  y  z  w
-            polygons[1][0][1][0]=makePolygon( 1, 2, 4, 3);
-            polygons[1][0][2][1]=makePolygon( 1, 2, 6, 5);
-            polygons[2][0][1][1]=makePolygon( 2, 4, 8, 6);
-            polygons[1][0][0][1]=makePolygon( 4, 3, 7, 8);
-            polygons[0][0][1][1]=makePolygon( 3, 1, 5, 7);
-            polygons[1][1][2][0]=makePolygon( 1, 2,14,13);
-            polygons[2][1][1][0]=makePolygon( 2, 4,16,14);
-            polygons[1][1][0][0]=makePolygon( 4, 3,15,16);
-            polygons[0][1][1][0]=makePolygon( 3, 1,13,15);
-            polygons[1][0][1][2]=makePolygon( 5, 6, 8, 7);
-            polygons[1][1][2][2]=makePolygon( 5, 6,10, 9);
-            polygons[2][1][1][2]=makePolygon( 6, 8,12,10);
-            polygons[1][1][0][2]=makePolygon( 8, 7,11,12);
-            polygons[0][1][1][2]=makePolygon( 7, 5, 9,11);
-            polygons[1][2][1][2]=makePolygon( 9,10,12,11);
-            polygons[1][2][2][1]=makePolygon( 9,10,14,13);
-            polygons[2][2][1][1]=makePolygon(10,12,16,14);
-            polygons[1][2][0][1]=makePolygon(12,11,15,16);
-            polygons[0][2][1][1]=makePolygon(11, 9,13,15);
-            polygons[1][2][1][0]=makePolygon(13,14,16,15);
-            polygons[0][1][2][1]=makePolygon( 1, 5, 9,13);
-            polygons[2][1][2][1]=makePolygon( 2, 6,10,14);
-            polygons[2][1][0][1]=makePolygon( 4, 8,12,16);
-            polygons[0][1][0][1]=makePolygon( 3, 7,11,15);
+            polygons[1][0][1][0] = makePolygon(1, 2, 4, 3);
+            polygons[1][0][2][1] = makePolygon(1, 2, 6, 5);
+            polygons[2][0][1][1] = makePolygon(2, 4, 8, 6);
+            polygons[1][0][0][1] = makePolygon(4, 3, 7, 8);
+            polygons[0][0][1][1] = makePolygon(3, 1, 5, 7);
+            polygons[1][1][2][0] = makePolygon(1, 2, 14, 13);
+            polygons[2][1][1][0] = makePolygon(2, 4, 16, 14);
+            polygons[1][1][0][0] = makePolygon(4, 3, 15, 16);
+            polygons[0][1][1][0] = makePolygon(3, 1, 13, 15);
+            polygons[1][0][1][2] = makePolygon(5, 6, 8, 7);
+            polygons[1][1][2][2] = makePolygon(5, 6, 10, 9);
+            polygons[2][1][1][2] = makePolygon(6, 8, 12, 10);
+            polygons[1][1][0][2] = makePolygon(8, 7, 11, 12);
+            polygons[0][1][1][2] = makePolygon(7, 5, 9, 11);
+            polygons[1][2][1][2] = makePolygon(9, 10, 12, 11);
+            polygons[1][2][2][1] = makePolygon(9, 10, 14, 13);
+            polygons[2][2][1][1] = makePolygon(10, 12, 16, 14);
+            polygons[1][2][0][1] = makePolygon(12, 11, 15, 16);
+            polygons[0][2][1][1] = makePolygon(11, 9, 13, 15);
+            polygons[1][2][1][0] = makePolygon(13, 14, 16, 15);
+            polygons[0][1][2][1] = makePolygon(1, 5, 9, 13);
+            polygons[2][1][2][1] = makePolygon(2, 6, 10, 14);
+            polygons[2][1][0][1] = makePolygon(4, 8, 12, 16);
+            polygons[0][1][0][1] = makePolygon(3, 7, 11, 15);
         }
     }
 }
