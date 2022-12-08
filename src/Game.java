@@ -7,10 +7,10 @@ import java.awt.event.MouseMotionListener;
 public class Game extends JPanel implements MouseListener, MouseMotionListener {
     Board board = new Board();
     State state = new State();
-    Ball ball1 = new Ball();
-    Ball ball2 = new Ball();
-    Ball ball3 = new Ball();
-    Ball ball4 = new Ball();
+    Balls ball1 = new Balls();
+    Balls ball2 = new Balls();
+    Balls ball3 = new Balls();
+    Balls ball4 = new Balls();
     Faces faces = new Faces();
     boolean stop = false;
     boolean end = false;
@@ -46,11 +46,11 @@ public class Game extends JPanel implements MouseListener, MouseMotionListener {
                         restart();
                     }
                 } else {
-                    /*
-                    g2d.drawString("                            Y    ", 360,525);
-                    g2d.setColor(Color.blue);
-                    g2d.drawString("                                N", 360,525);
-                    */
+
+//                    g2d.drawString("                            Y    ", 360,525);
+//                    g2d.setColor(Color.blue);
+//                    g2d.drawString("                                N", 360,525);
+
                     Rectangle boundsN = new Rectangle(772, 505, 20, 20);
                     Rectangle boundsY = new Rectangle(720, 505, 20, 20);
                     if (boundsN.contains(e.getX(), e.getY())) {
@@ -64,6 +64,7 @@ public class Game extends JPanel implements MouseListener, MouseMotionListener {
                 ball2.mouseClicked(e);
                 ball3.mouseClicked(e);
                 ball4.mouseClicked(e);
+                System.out.println(e.getX() + ", " + e.getY());
             }
 
             @Override
@@ -87,10 +88,14 @@ public class Game extends JPanel implements MouseListener, MouseMotionListener {
             @Override
             public void mouseMoved(MouseEvent e) {
                 if (!end) {
-                    faces.mouseMoved(e);
+                    Faces temp = faces.mouseMoved(e);
+                    if(temp!=null){
+                        faces.preview = board.loadGeneric(temp);
+                    } else {
+                        faces.preview = board.board;
+                    }
                 }
             }
-
             @Override
             public void mouseDragged(MouseEvent e) {
 
@@ -135,11 +140,12 @@ public class Game extends JPanel implements MouseListener, MouseMotionListener {
             state.paintCube(g2d);
             faces.paintAtlas(g2d);
             g2d.draw(resetButton);
-            g.setFont(new Font("Courier", Font.PLAIN, 30));
+            g2d.setFont(new Font("Courier", Font.PLAIN, 30));
             g2d.drawString("R",17,35);
-            g.setFont(new Font("Courier", Font.PLAIN, 15));
+            g2d.setFont(new Font("Courier", Font.PLAIN, 15));
             faces.paintCompass(g2d);
-        } else {
+        }
+        else {
             g.setFont(new Font("Courier", Font.PLAIN, 40));
             if (state.hyper == 'x') {
                 g.setColor(new Color(12, 1, 5));

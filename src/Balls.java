@@ -3,7 +3,7 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
-public class Ball {
+public class Balls {
     Random ran = new Random();
     double ballX = 0;
     double ballY = 0;
@@ -11,7 +11,7 @@ public class Ball {
     boolean flipX = false;
     double slope = 1.0;
 
-    public Ball() {
+    public Balls() {
         ballY = ran.nextInt(600);
         ballX = ran.nextInt(1100);
         if(ran.nextInt(2)==0){
