@@ -335,6 +335,7 @@ public class Board {
             g.setColor(Color.black);
         }
         g.drawString("      " + me.toString(), 340, 580 - 15);
+
         g.setColor(Color.white);
         g.drawString("State ", 660, 580 - 15);
         if (isWon(state)) {
